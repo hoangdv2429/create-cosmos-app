@@ -4,15 +4,16 @@
 * DO NOT MODIFY BY HAND. Instead, download the latest proto files for your chain
 * and run the transpile command or yarn proto command to regenerate this bundle.
 */
-
+import { QueryClient, createProtobufRpcClient, ProtobufRpcClient } from '@cosmjs/stargate'
 import { Tendermint34Client, HttpEndpoint } from "@cosmjs/tendermint-rpc";
 import { grpc } from "@improbable-eng/grpc-web";
 import { NodeHttpTransport } from "@improbable-eng/grpc-web-node-http-transport";
 import { GrpcWebImpl } from '../codegen/cosmos/bank/v1beta1/query.rpc.Query';
 import { ServiceClientImpl } from "../codegen/cosmos/tx/v1beta1/service.rpc.Service";
+import { QueryClientImpl } from "../codegen/cosmos/bank/v1beta1/query.rpc.Query";
 
-const _rpcClients: Record<string, ServiceClientImpl> = {};
-let tmClient: import("../codegen/cosmos/tx/v1beta1/service.rpc.Service").ServiceClientImpl
+const _rpcClients: Record<string, ProtobufRpcClient> = {};
+let tmClient: QueryClientImpl;
 let grpcWeb: GrpcWebImpl;
 
 export const getRpcEndpointKey = (rpcEndpoint: string | HttpEndpoint) => {
@@ -50,12 +51,9 @@ export const getRpcClient = async (rpcEndpoint: string | HttpEndpoint) => {
     }
 
     //@ts-ignore
-    // const client = new QueryClient(tmClient);
-    // const rpc = createProtobufRpcClient(client);
-    const { ServiceClientImpl } = await import(
-        "../codegen/cosmos/tx/v1beta1/service.rpc.Service"
-      );
-      const tmClient = new ServiceClientImpl(grpcWeb);
-    _rpcClients[key] = tmClient;
-    return tmClient;
+    const client = new QueryClient(grpcWeb);
+    const rpc = createProtobufRpcClient(client);
+    // tmClient = new QueryClientImpl(grpcWeb);
+    _rpcClients[key] = rpc;
+    return rpc;
 }
