@@ -1,93 +1,53 @@
-import { Rpc } from '../../../helpers';
-import * as _m0 from 'protobufjs/minimal';
-import {
-  action,
-  computed,
-  makeAutoObservable,
-  makeObservable,
-  observable,
-  override,
-  reaction,
-  runInAction,
-} from 'mobx';
-import {
-  QueryClient,
-  createProtobufRpcClient,
-  ProtobufRpcClient,
-} from '@cosmjs/stargate';
-import { ReactQueryParams } from '../../../react-query';
-import { QueryStatus, useQuery } from '@tanstack/react-query';
-import {
-  QueryBalanceRequest,
-  QueryBalanceResponse,
-  QueryAllBalancesRequest,
-  QueryAllBalancesResponse,
-  QuerySpendableBalancesRequest,
-  QuerySpendableBalancesResponse,
-  QueryTotalSupplyRequest,
-  QueryTotalSupplyResponse,
-  QuerySupplyOfRequest,
-  QuerySupplyOfResponse,
-  QueryParamsRequest,
-  QueryParamsResponse,
-  QueryDenomMetadataRequest,
-  QueryDenomMetadataResponse,
-  QueryDenomsMetadataRequest,
-  QueryDenomsMetadataResponse,
-  QueryDenomOwnersRequest,
-  QueryDenomOwnersResponse,
-} from './query';
-import BigNumber from 'bignumber.js';
-/** Query defines the gRPC querier service. */
+import { PageRequest, PageRequestSDKType, PageResponse, PageResponseSDKType } from "../../base/query/v1beta1/pagination";
+import { Coin, CoinSDKType } from "../../base/v1beta1/coin";
+import { Params, ParamsSDKType, Metadata, MetadataSDKType } from "./bank";
+import * as _m0 from "protobufjs/minimal";
+import { grpc } from "@improbable-eng/grpc-web";
+import { UnaryMethodDefinitionish } from "../../../grpc-web";
+import { DeepPartial } from "../../../helpers";
+import { BrowserHeaders } from "browser-headers";
+import { ReactQueryParams } from "../../../react-query";
+import { QueryClient, createProtobufRpcClient, ProtobufRpcClient } from "@cosmjs/stargate";
+import { useQuery } from "@tanstack/react-query";
+import { QueryBalanceRequest, QueryBalanceRequestSDKType, QueryBalanceResponse, QueryBalanceResponseSDKType, QueryAllBalancesRequest, QueryAllBalancesRequestSDKType, QueryAllBalancesResponse, QueryAllBalancesResponseSDKType, QuerySpendableBalancesRequest, QuerySpendableBalancesRequestSDKType, QuerySpendableBalancesResponse, QuerySpendableBalancesResponseSDKType, QueryTotalSupplyRequest, QueryTotalSupplyRequestSDKType, QueryTotalSupplyResponse, QueryTotalSupplyResponseSDKType, QuerySupplyOfRequest, QuerySupplyOfRequestSDKType, QuerySupplyOfResponse, QuerySupplyOfResponseSDKType, QueryParamsRequest, QueryParamsRequestSDKType, QueryParamsResponse, QueryParamsResponseSDKType, QueryDenomMetadataRequest, QueryDenomMetadataRequestSDKType, QueryDenomMetadataResponse, QueryDenomMetadataResponseSDKType, QueryDenomsMetadataRequest, QueryDenomsMetadataRequestSDKType, QueryDenomsMetadataResponse, QueryDenomsMetadataResponseSDKType, QueryDenomOwnersRequest, QueryDenomOwnersRequestSDKType, QueryDenomOwnersResponse, QueryDenomOwnersResponseSDKType } from "./query";
 
+/** Query defines the gRPC querier service. */
 export interface Query {
   /** Balance queries the balance of a single coin for a single account. */
-  balance(request: QueryBalanceRequest): Promise<QueryBalanceResponse>;
-  /** AllBalances queries the balance of all coins for a single account. */
+  balance(request: DeepPartial<QueryBalanceRequest>, metadata?: grpc.Metadata): Promise<QueryBalanceResponse>;
 
-  allBalances(
-    request: QueryAllBalancesRequest
-  ): Promise<QueryAllBalancesResponse>;
+  /** AllBalances queries the balance of all coins for a single account. */
+  allBalances(request: DeepPartial<QueryAllBalancesRequest>, metadata?: grpc.Metadata): Promise<QueryAllBalancesResponse>;
+
   /**
    * SpendableBalances queries the spenable balance of all coins for a single
    * account.
    */
+  spendableBalances(request: DeepPartial<QuerySpendableBalancesRequest>, metadata?: grpc.Metadata): Promise<QuerySpendableBalancesResponse>;
 
-  spendableBalances(
-    request: QuerySpendableBalancesRequest
-  ): Promise<QuerySpendableBalancesResponse>;
   /** TotalSupply queries the total supply of all coins. */
+  totalSupply(request?: DeepPartial<QueryTotalSupplyRequest>, metadata?: grpc.Metadata): Promise<QueryTotalSupplyResponse>;
 
-  totalSupply(
-    request?: QueryTotalSupplyRequest
-  ): Promise<QueryTotalSupplyResponse>;
   /** SupplyOf queries the supply of a single coin. */
+  supplyOf(request: DeepPartial<QuerySupplyOfRequest>, metadata?: grpc.Metadata): Promise<QuerySupplyOfResponse>;
 
-  supplyOf(request: QuerySupplyOfRequest): Promise<QuerySupplyOfResponse>;
   /** Params queries the parameters of x/bank module. */
+  params(request?: DeepPartial<QueryParamsRequest>, metadata?: grpc.Metadata): Promise<QueryParamsResponse>;
 
-  params(request?: QueryParamsRequest): Promise<QueryParamsResponse>;
   /** DenomsMetadata queries the client metadata of a given coin denomination. */
+  denomMetadata(request: DeepPartial<QueryDenomMetadataRequest>, metadata?: grpc.Metadata): Promise<QueryDenomMetadataResponse>;
 
-  denomMetadata(
-    request: QueryDenomMetadataRequest
-  ): Promise<QueryDenomMetadataResponse>;
   /**
    * DenomsMetadata queries the client metadata for all registered coin
    * denominations.
    */
+  denomsMetadata(request?: DeepPartial<QueryDenomsMetadataRequest>, metadata?: grpc.Metadata): Promise<QueryDenomsMetadataResponse>;
 
-  denomsMetadata(
-    request?: QueryDenomsMetadataRequest
-  ): Promise<QueryDenomsMetadataResponse>;
   /**
    * DenomOwners queries for all account addresses that own a particular token
    * denomination.
    */
-
-  denomOwners(
-    request: QueryDenomOwnersRequest
-  ): Promise<QueryDenomOwnersResponse>;
+  denomOwners(request: DeepPartial<QueryDenomOwnersRequest>, metadata?: grpc.Metadata): Promise<QueryDenomOwnersResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
@@ -105,226 +65,346 @@ export class QueryClientImpl implements Query {
     this.denomOwners = this.denomOwners.bind(this);
   }
 
-  balance(request: QueryBalanceRequest): Promise<QueryBalanceResponse> {
-    const data = QueryBalanceRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      'cosmos.bank.v1beta1.Query',
-      'Balance',
-      data
-    );
-    return promise.then((data) =>
-      QueryBalanceResponse.decode(new _m0.Reader(data))
-    );
+  balance(request: DeepPartial<QueryBalanceRequest>, metadata?: grpc.Metadata): Promise<QueryBalanceResponse> {
+    return this.rpc.unary(QueryBalanceDesc, QueryBalanceRequest.fromPartial(request), metadata);
   }
 
-  allBalances(
-    request: QueryAllBalancesRequest
-  ): Promise<QueryAllBalancesResponse> {
-    const data = QueryAllBalancesRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      'cosmos.bank.v1beta1.Query',
-      'AllBalances',
-      data
-    );
-    return promise.then((data) =>
-      QueryAllBalancesResponse.decode(new _m0.Reader(data))
-    );
+  allBalances(request: DeepPartial<QueryAllBalancesRequest>, metadata?: grpc.Metadata): Promise<QueryAllBalancesResponse> {
+    return this.rpc.unary(QueryAllBalancesDesc, QueryAllBalancesRequest.fromPartial(request), metadata);
   }
 
-  spendableBalances(
-    request: QuerySpendableBalancesRequest
-  ): Promise<QuerySpendableBalancesResponse> {
-    const data = QuerySpendableBalancesRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      'cosmos.bank.v1beta1.Query',
-      'SpendableBalances',
-      data
-    );
-    return promise.then((data) =>
-      QuerySpendableBalancesResponse.decode(new _m0.Reader(data))
-    );
+  spendableBalances(request: DeepPartial<QuerySpendableBalancesRequest>, metadata?: grpc.Metadata): Promise<QuerySpendableBalancesResponse> {
+    return this.rpc.unary(QuerySpendableBalancesDesc, QuerySpendableBalancesRequest.fromPartial(request), metadata);
   }
 
-  totalSupply(
-    request: QueryTotalSupplyRequest = {
-      pagination: undefined,
-    }
-  ): Promise<QueryTotalSupplyResponse> {
-    const data = QueryTotalSupplyRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      'cosmos.bank.v1beta1.Query',
-      'TotalSupply',
-      data
-    );
-    return promise.then((data) =>
-      QueryTotalSupplyResponse.decode(new _m0.Reader(data))
-    );
+  totalSupply(request: DeepPartial<QueryTotalSupplyRequest> = {
+    pagination: undefined
+  }, metadata?: grpc.Metadata): Promise<QueryTotalSupplyResponse> {
+    return this.rpc.unary(QueryTotalSupplyDesc, QueryTotalSupplyRequest.fromPartial(request), metadata);
   }
 
-  supplyOf(request: QuerySupplyOfRequest): Promise<QuerySupplyOfResponse> {
-    const data = QuerySupplyOfRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      'cosmos.bank.v1beta1.Query',
-      'SupplyOf',
-      data
-    );
-    return promise.then((data) =>
-      QuerySupplyOfResponse.decode(new _m0.Reader(data))
-    );
+  supplyOf(request: DeepPartial<QuerySupplyOfRequest>, metadata?: grpc.Metadata): Promise<QuerySupplyOfResponse> {
+    return this.rpc.unary(QuerySupplyOfDesc, QuerySupplyOfRequest.fromPartial(request), metadata);
   }
 
-  params(request: QueryParamsRequest = {}): Promise<QueryParamsResponse> {
-    const data = QueryParamsRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      'cosmos.bank.v1beta1.Query',
-      'Params',
-      data
-    );
-    return promise.then((data) =>
-      QueryParamsResponse.decode(new _m0.Reader(data))
-    );
+  params(request: DeepPartial<QueryParamsRequest> = {}, metadata?: grpc.Metadata): Promise<QueryParamsResponse> {
+    return this.rpc.unary(QueryParamsDesc, QueryParamsRequest.fromPartial(request), metadata);
   }
 
-  denomMetadata(
-    request: QueryDenomMetadataRequest
-  ): Promise<QueryDenomMetadataResponse> {
-    const data = QueryDenomMetadataRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      'cosmos.bank.v1beta1.Query',
-      'DenomMetadata',
-      data
-    );
-    return promise.then((data) =>
-      QueryDenomMetadataResponse.decode(new _m0.Reader(data))
-    );
+  denomMetadata(request: DeepPartial<QueryDenomMetadataRequest>, metadata?: grpc.Metadata): Promise<QueryDenomMetadataResponse> {
+    return this.rpc.unary(QueryDenomMetadataDesc, QueryDenomMetadataRequest.fromPartial(request), metadata);
   }
 
-  denomsMetadata(
-    request: QueryDenomsMetadataRequest = {
-      pagination: undefined,
-    }
-  ): Promise<QueryDenomsMetadataResponse> {
-    const data = QueryDenomsMetadataRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      'cosmos.bank.v1beta1.Query',
-      'DenomsMetadata',
-      data
-    );
-    return promise.then((data) =>
-      QueryDenomsMetadataResponse.decode(new _m0.Reader(data))
-    );
+  denomsMetadata(request: DeepPartial<QueryDenomsMetadataRequest> = {
+    pagination: undefined
+  }, metadata?: grpc.Metadata): Promise<QueryDenomsMetadataResponse> {
+    return this.rpc.unary(QueryDenomsMetadataDesc, QueryDenomsMetadataRequest.fromPartial(request), metadata);
   }
 
-  denomOwners(
-    request: QueryDenomOwnersRequest
-  ): Promise<QueryDenomOwnersResponse> {
-    const data = QueryDenomOwnersRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      'cosmos.bank.v1beta1.Query',
-      'DenomOwners',
-      data
-    );
-    return promise.then((data) =>
-      QueryDenomOwnersResponse.decode(new _m0.Reader(data))
-    );
+  denomOwners(request: DeepPartial<QueryDenomOwnersRequest>, metadata?: grpc.Metadata): Promise<QueryDenomOwnersResponse> {
+    return this.rpc.unary(QueryDenomOwnersDesc, QueryDenomOwnersRequest.fromPartial(request), metadata);
   }
+
 }
-export const createRpcQueryExtension = (base: QueryClient) => {
-  const rpc = createProtobufRpcClient(base);
-  const queryService = new QueryClientImpl(rpc);
-  return {
-    balance(request: QueryBalanceRequest): Promise<QueryBalanceResponse> {
-      return queryService.balance(request);
-    },
-
-    allBalances(
-      request: QueryAllBalancesRequest
-    ): Promise<QueryAllBalancesResponse> {
-      return queryService.allBalances(request);
-    },
-
-    spendableBalances(
-      request: QuerySpendableBalancesRequest
-    ): Promise<QuerySpendableBalancesResponse> {
-      return queryService.spendableBalances(request);
-    },
-
-    totalSupply(
-      request?: QueryTotalSupplyRequest
-    ): Promise<QueryTotalSupplyResponse> {
-      return queryService.totalSupply(request);
-    },
-
-    supplyOf(request: QuerySupplyOfRequest): Promise<QuerySupplyOfResponse> {
-      return queryService.supplyOf(request);
-    },
-
-    params(request?: QueryParamsRequest): Promise<QueryParamsResponse> {
-      return queryService.params(request);
-    },
-
-    denomMetadata(
-      request: QueryDenomMetadataRequest
-    ): Promise<QueryDenomMetadataResponse> {
-      return queryService.denomMetadata(request);
-    },
-
-    denomsMetadata(
-      request?: QueryDenomsMetadataRequest
-    ): Promise<QueryDenomsMetadataResponse> {
-      return queryService.denomsMetadata(request);
-    },
-
-    denomOwners(
-      request: QueryDenomOwnersRequest
-    ): Promise<QueryDenomOwnersResponse> {
-      return queryService.denomOwners(request);
-    },
-  };
+export const QueryDesc = {
+  serviceName: "cosmos.bank.v1beta1.Query"
 };
-export interface UseBalanceQuery<TData>
-  extends ReactQueryParams<QueryBalanceResponse, TData> {
+export const QueryBalanceDesc: UnaryMethodDefinitionish = {
+  methodName: "Balance",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryBalanceRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryBalanceResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryAllBalancesDesc: UnaryMethodDefinitionish = {
+  methodName: "AllBalances",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryAllBalancesRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryAllBalancesResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QuerySpendableBalancesDesc: UnaryMethodDefinitionish = {
+  methodName: "SpendableBalances",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QuerySpendableBalancesRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QuerySpendableBalancesResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryTotalSupplyDesc: UnaryMethodDefinitionish = {
+  methodName: "TotalSupply",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryTotalSupplyRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryTotalSupplyResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QuerySupplyOfDesc: UnaryMethodDefinitionish = {
+  methodName: "SupplyOf",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QuerySupplyOfRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QuerySupplyOfResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryParamsDesc: UnaryMethodDefinitionish = {
+  methodName: "Params",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryParamsRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryParamsResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryDenomMetadataDesc: UnaryMethodDefinitionish = {
+  methodName: "DenomMetadata",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryDenomMetadataRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryDenomMetadataResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryDenomsMetadataDesc: UnaryMethodDefinitionish = {
+  methodName: "DenomsMetadata",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryDenomsMetadataRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryDenomsMetadataResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryDenomOwnersDesc: UnaryMethodDefinitionish = {
+  methodName: "DenomOwners",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryDenomOwnersRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryDenomOwnersResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export interface Rpc {
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, request: any, metadata: grpc.Metadata | undefined): Promise<any>;
+}
+export class GrpcWebImpl {
+  host: string;
+  options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  };
+
+  constructor(host: string, options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  }) {
+    this.host = host;
+    this.options = options;
+  }
+
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, _request: any, metadata: grpc.Metadata | undefined) {
+    const request = { ..._request,
+      ...methodDesc.requestType
+    };
+    const maybeCombinedMetadata = metadata && this.options.metadata ? new BrowserHeaders({ ...this.options?.metadata.headersMap,
+      ...metadata?.headersMap
+    }) : metadata || this.options.metadata;
+    return new Promise((resolve, reject) => {
+      grpc.unary(methodDesc, {
+        request,
+        host: this.host,
+        metadata: maybeCombinedMetadata,
+        transport: this.options.transport,
+        debug: this.options.debug,
+        onEnd: function (response) {
+          if (response.status === grpc.Code.OK) {
+            resolve(response.message);
+          } else {
+            const err = (new Error(response.statusMessage) as any);
+            err.code = response.status;
+            err.metadata = response.trailers;
+            reject(err);
+          }
+        }
+      });
+    });
+  }
+
+}
+export interface UseBalanceQuery<TData> extends ReactQueryParams<QueryBalanceResponse, TData> {
   request: QueryBalanceRequest;
 }
-export interface UseAllBalancesQuery<TData>
-  extends ReactQueryParams<QueryAllBalancesResponse, TData> {
+export interface UseAllBalancesQuery<TData> extends ReactQueryParams<QueryAllBalancesResponse, TData> {
   request: QueryAllBalancesRequest;
 }
-export interface UseSpendableBalancesQuery<TData>
-  extends ReactQueryParams<QuerySpendableBalancesResponse, TData> {
+export interface UseSpendableBalancesQuery<TData> extends ReactQueryParams<QuerySpendableBalancesResponse, TData> {
   request: QuerySpendableBalancesRequest;
 }
-export interface UseTotalSupplyQuery<TData>
-  extends ReactQueryParams<QueryTotalSupplyResponse, TData> {
+export interface UseTotalSupplyQuery<TData> extends ReactQueryParams<QueryTotalSupplyResponse, TData> {
   request?: QueryTotalSupplyRequest;
 }
-export interface UseSupplyOfQuery<TData>
-  extends ReactQueryParams<QuerySupplyOfResponse, TData> {
+export interface UseSupplyOfQuery<TData> extends ReactQueryParams<QuerySupplyOfResponse, TData> {
   request: QuerySupplyOfRequest;
 }
-export interface UseParamsQuery<TData>
-  extends ReactQueryParams<QueryParamsResponse, TData> {
+export interface UseParamsQuery<TData> extends ReactQueryParams<QueryParamsResponse, TData> {
   request?: QueryParamsRequest;
 }
-export interface UseDenomMetadataQuery<TData>
-  extends ReactQueryParams<QueryDenomMetadataResponse, TData> {
+export interface UseDenomMetadataQuery<TData> extends ReactQueryParams<QueryDenomMetadataResponse, TData> {
   request: QueryDenomMetadataRequest;
 }
-export interface UseDenomsMetadataQuery<TData>
-  extends ReactQueryParams<QueryDenomsMetadataResponse, TData> {
+export interface UseDenomsMetadataQuery<TData> extends ReactQueryParams<QueryDenomsMetadataResponse, TData> {
   request?: QueryDenomsMetadataRequest;
 }
-export interface UseDenomOwnersQuery<TData>
-  extends ReactQueryParams<QueryDenomOwnersResponse, TData> {
+export interface UseDenomOwnersQuery<TData> extends ReactQueryParams<QueryDenomOwnersResponse, TData> {
   request: QueryDenomOwnersRequest;
 }
 
-const _queryClients: WeakMap<ProtobufRpcClient, QueryClientImpl> =
-  new WeakMap();
+const _queryClients: WeakMap<ProtobufRpcClient, QueryClientImpl> = new WeakMap();
 
-const getQueryService = (
-  rpc: ProtobufRpcClient | undefined
-): QueryClientImpl | undefined => {
+const getQueryService = (rpc: ProtobufRpcClient | undefined): QueryClientImpl | undefined => {
   if (!rpc) return;
 
   if (_queryClients.has(rpc)) {
@@ -341,130 +421,94 @@ const getQueryService = (
 export const createRpcQueryHooks = (rpc: ProtobufRpcClient | undefined) => {
   const queryService = getQueryService(rpc);
 
-  const useBalance = <TData = QueryBalanceResponse>({
+  const useBalance = <TData = QueryBalanceResponse,>({
     request,
-    options,
+    options
   }: UseBalanceQuery<TData>) => {
-    return useQuery<QueryBalanceResponse, Error, TData>(
-      ['balanceQuery', request],
-      () => {
-        if (!queryService) throw new Error('Query Service not initialized');
-        return queryService.balance(request);
-      },
-      options
-    );
+    return useQuery<QueryBalanceResponse, Error, TData>(["balanceQuery", request], () => {
+      if (!queryService) throw new Error("Query Service not initialized");
+      return queryService.balance(request);
+    }, options);
   };
 
-  const useAllBalances = <TData = QueryAllBalancesResponse>({
+  const useAllBalances = <TData = QueryAllBalancesResponse,>({
     request,
-    options,
+    options
   }: UseAllBalancesQuery<TData>) => {
-    return useQuery<QueryAllBalancesResponse, Error, TData>(
-      ['allBalancesQuery', request],
-      () => {
-        if (!queryService) throw new Error('Query Service not initialized');
-        return queryService.allBalances(request);
-      },
-      options
-    );
+    return useQuery<QueryAllBalancesResponse, Error, TData>(["allBalancesQuery", request], () => {
+      if (!queryService) throw new Error("Query Service not initialized");
+      return queryService.allBalances(request);
+    }, options);
   };
 
-  const useSpendableBalances = <TData = QuerySpendableBalancesResponse>({
+  const useSpendableBalances = <TData = QuerySpendableBalancesResponse,>({
     request,
-    options,
+    options
   }: UseSpendableBalancesQuery<TData>) => {
-    return useQuery<QuerySpendableBalancesResponse, Error, TData>(
-      ['spendableBalancesQuery', request],
-      () => {
-        if (!queryService) throw new Error('Query Service not initialized');
-        return queryService.spendableBalances(request);
-      },
-      options
-    );
+    return useQuery<QuerySpendableBalancesResponse, Error, TData>(["spendableBalancesQuery", request], () => {
+      if (!queryService) throw new Error("Query Service not initialized");
+      return queryService.spendableBalances(request);
+    }, options);
   };
 
-  const useTotalSupply = <TData = QueryTotalSupplyResponse>({
+  const useTotalSupply = <TData = QueryTotalSupplyResponse,>({
     request,
-    options,
+    options
   }: UseTotalSupplyQuery<TData>) => {
-    return useQuery<QueryTotalSupplyResponse, Error, TData>(
-      ['totalSupplyQuery', request],
-      () => {
-        if (!queryService) throw new Error('Query Service not initialized');
-        return queryService.totalSupply(request);
-      },
-      options
-    );
+    return useQuery<QueryTotalSupplyResponse, Error, TData>(["totalSupplyQuery", request], () => {
+      if (!queryService) throw new Error("Query Service not initialized");
+      return queryService.totalSupply(request);
+    }, options);
   };
 
-  const useSupplyOf = <TData = QuerySupplyOfResponse>({
+  const useSupplyOf = <TData = QuerySupplyOfResponse,>({
     request,
-    options,
+    options
   }: UseSupplyOfQuery<TData>) => {
-    return useQuery<QuerySupplyOfResponse, Error, TData>(
-      ['supplyOfQuery', request],
-      () => {
-        if (!queryService) throw new Error('Query Service not initialized');
-        return queryService.supplyOf(request);
-      },
-      options
-    );
+    return useQuery<QuerySupplyOfResponse, Error, TData>(["supplyOfQuery", request], () => {
+      if (!queryService) throw new Error("Query Service not initialized");
+      return queryService.supplyOf(request);
+    }, options);
   };
 
-  const useParams = <TData = QueryParamsResponse>({
+  const useParams = <TData = QueryParamsResponse,>({
     request,
-    options,
+    options
   }: UseParamsQuery<TData>) => {
-    return useQuery<QueryParamsResponse, Error, TData>(
-      ['paramsQuery', request],
-      () => {
-        if (!queryService) throw new Error('Query Service not initialized');
-        return queryService.params(request);
-      },
-      options
-    );
+    return useQuery<QueryParamsResponse, Error, TData>(["paramsQuery", request], () => {
+      if (!queryService) throw new Error("Query Service not initialized");
+      return queryService.params(request);
+    }, options);
   };
 
-  const useDenomMetadata = <TData = QueryDenomMetadataResponse>({
+  const useDenomMetadata = <TData = QueryDenomMetadataResponse,>({
     request,
-    options,
+    options
   }: UseDenomMetadataQuery<TData>) => {
-    return useQuery<QueryDenomMetadataResponse, Error, TData>(
-      ['denomMetadataQuery', request],
-      () => {
-        if (!queryService) throw new Error('Query Service not initialized');
-        return queryService.denomMetadata(request);
-      },
-      options
-    );
+    return useQuery<QueryDenomMetadataResponse, Error, TData>(["denomMetadataQuery", request], () => {
+      if (!queryService) throw new Error("Query Service not initialized");
+      return queryService.denomMetadata(request);
+    }, options);
   };
 
-  const useDenomsMetadata = <TData = QueryDenomsMetadataResponse>({
+  const useDenomsMetadata = <TData = QueryDenomsMetadataResponse,>({
     request,
-    options,
+    options
   }: UseDenomsMetadataQuery<TData>) => {
-    return useQuery<QueryDenomsMetadataResponse, Error, TData>(
-      ['denomsMetadataQuery', request],
-      () => {
-        if (!queryService) throw new Error('Query Service not initialized');
-        return queryService.denomsMetadata(request);
-      },
-      options
-    );
+    return useQuery<QueryDenomsMetadataResponse, Error, TData>(["denomsMetadataQuery", request], () => {
+      if (!queryService) throw new Error("Query Service not initialized");
+      return queryService.denomsMetadata(request);
+    }, options);
   };
 
-  const useDenomOwners = <TData = QueryDenomOwnersResponse>({
+  const useDenomOwners = <TData = QueryDenomOwnersResponse,>({
     request,
-    options,
+    options
   }: UseDenomOwnersQuery<TData>) => {
-    return useQuery<QueryDenomOwnersResponse, Error, TData>(
-      ['denomOwnersQuery', request],
-      () => {
-        if (!queryService) throw new Error('Query Service not initialized');
-        return queryService.denomOwners(request);
-      },
-      options
-    );
+    return useQuery<QueryDenomOwnersResponse, Error, TData>(["denomOwnersQuery", request], () => {
+      if (!queryService) throw new Error("Query Service not initialized");
+      return queryService.denomOwners(request);
+    }, options);
   };
 
   return {
@@ -502,188 +546,6 @@ export const createRpcQueryHooks = (rpc: ProtobufRpcClient | undefined) => {
      * DenomOwners queries for all account addresses that own a particular token
      * denomination.
      */
-    useDenomOwners,
-  };
-};
-
-interface MobxResponse<T> {
-  data: T | undefined;
-  isSuccess: boolean;
-  isLoading: boolean;
-  refetch: () => Promise<void>;
-}
-
-interface MobxQueryBalanceRequest {
-  data: QueryBalanceResponse | undefined;
-  isSuccess: boolean;
-  isLoading: boolean;
-  refetch: () => Promise<void>;
-}
-
-export const createRpcStores = (rpc: ProtobufRpcClient | undefined) => {
-  const queryService = getQueryService(rpc);
-
-  class QueryStore<Request, Response> {
-    state?: QueryStatus;
-    request?: Request;
-    response?: Response;
-    fetchFunc?: (request: Request) => Promise<Response>;
-
-    constructor(fetchFunc?: (request: Request) => Promise<Response>) {
-      this.fetchFunc = fetchFunc;
-      makeObservable(this, {
-        state: observable,
-        request: observable.ref,
-        response: observable.ref,
-        isLoading: computed,
-        isSuccess: computed,
-        refetch: action.bound,
-        getData: action.bound,
-      });
-      // reaction(
-      //   () => this.request,
-      //   () => {
-      //     if (this.fetchFunc) {
-      //       console.log(
-      //         '%cquery.rpc.Query.ts line:544 1',
-      //         'color: #007acc;',
-      //         this.request
-      //       );
-      //       this.refetch();
-      //     }
-      //   }
-      // );
-    }
-
-    get isLoading() {
-      return this.state === 'loading';
-    }
-
-    get isSuccess() {
-      return this.state === 'success';
-    }
-
-    async refetch(): Promise<void> {
-      runInAction(() => {
-        this.response = void 0;
-        this.state = 'loading';
-      });
-      try {
-        if (!this.fetchFunc)
-          throw new Error(
-            'Query Service not initialized or request function not implemented'
-          );
-        if (!this.request) throw new Error('Request not provided');
-        const response = await this.fetchFunc(this.request);
-        runInAction(() => {
-          this.response = response;
-          this.state = 'success';
-        });
-        console.log(
-          '%cquery.rpc.Query.ts line:572 this.state',
-          'color: #007acc;',
-          this.state,
-          this.response
-        );
-      } catch (e) {
-        console.error(e);
-        runInAction(() => {
-          this.state = 'error';
-        });
-      }
-    }
-
-    getData(request: Request): MobxResponse<Response> {
-      runInAction(() => {
-        this.request = request;
-      });
-      return {
-        data: this.response,
-        isSuccess: this.isSuccess,
-        isLoading: this.isLoading,
-        refetch: this.refetch,
-      };
-    }
-  }
-
-  class BalanceStore {
-    state?: QueryStatus;
-    request?: QueryBalanceRequest;
-    response?: QueryBalanceResponse;
-
-    constructor() {
-      makeAutoObservable(this);
-    }
-
-    get isLoading() {
-      return this.state === 'loading';
-    }
-
-    get isSuccess() {
-      return this.state === 'success';
-    }
-
-    refetch = async (): Promise<void> => {
-      runInAction(() => {
-        this.response = void 0;
-        this.state = 'loading';
-      });
-      try {
-        if (!queryService) throw new Error('Query Service not initialized');
-        if (!this.request) throw new Error('Request not provided');
-        const response = await queryService.balance(this.request);
-        runInAction(() => {
-          this.response = response;
-          this.state = 'success';
-        });
-        console.log(
-          '%cquery.rpc.Query.ts line:572 this.state',
-          'color: #007acc;',
-          this.state,
-          this.response
-        );
-      } catch (e) {
-        runInAction(() => {
-          this.state = 'error';
-        });
-      }
-    };
-
-    balance(request: QueryBalanceRequest): MobxQueryBalanceRequest {
-      this.request = request;
-      return {
-        data: this.response,
-        isSuccess: this.isSuccess,
-        isLoading: this.isLoading,
-        refetch: this.refetch,
-      };
-    }
-  }
-
-  class BalanceStoreInherited extends QueryStore<
-    QueryBalanceRequest,
-    QueryBalanceResponse
-  > {
-    constructor() {
-      super(queryService?.balance);
-      makeObservable(this, {
-        state: override,
-        request: override,
-        response: override,
-        isLoading: override,
-        isSuccess: override,
-        refetch: override,
-        getData: override,
-      });
-    }
-
-    balance(request: QueryBalanceRequest): MobxResponse<QueryBalanceResponse> {
-      return this.getData(request);
-    }
-  }
-
-  return {
-    BalanceStore,
-    BalanceStoreInherited,
+    useDenomOwners
   };
 };

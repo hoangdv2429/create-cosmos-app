@@ -1,5 +1,5 @@
 import { GeneratedType, Registry } from "@cosmjs/proto-signing";
-import { MsgVerifyInvariant } from "./tx";
+import { MsgVerifyInvariant, MsgVerifyInvariantSDKType } from "./tx";
 export const registry: ReadonlyArray<[string, GeneratedType]> = [["/cosmos.crisis.v1beta1.MsgVerifyInvariant", MsgVerifyInvariant]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
@@ -21,6 +21,24 @@ export const MessageComposer = {
       return {
         typeUrl: "/cosmos.crisis.v1beta1.MsgVerifyInvariant",
         value
+      };
+    }
+
+  },
+  toJSON: {
+    verifyInvariant(value: MsgVerifyInvariant) {
+      return {
+        typeUrl: "/cosmos.crisis.v1beta1.MsgVerifyInvariant",
+        value: MsgVerifyInvariant.toJSON(value)
+      };
+    }
+
+  },
+  fromJSON: {
+    verifyInvariant(value: any) {
+      return {
+        typeUrl: "/cosmos.crisis.v1beta1.MsgVerifyInvariant",
+        value: MsgVerifyInvariant.fromJSON(value)
       };
     }
 

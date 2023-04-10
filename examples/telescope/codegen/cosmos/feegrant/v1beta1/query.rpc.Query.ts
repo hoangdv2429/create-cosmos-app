@@ -1,23 +1,25 @@
-import { Rpc } from "../../../helpers";
+import { PageRequest, PageRequestSDKType, PageResponse, PageResponseSDKType } from "../../base/query/v1beta1/pagination";
+import { Grant, GrantSDKType } from "./feegrant";
 import * as _m0 from "protobufjs/minimal";
-import { QueryClient, createProtobufRpcClient, ProtobufRpcClient } from "@cosmjs/stargate";
-import { ReactQueryParams } from "../../../react-query";
-import { useQuery } from "@tanstack/react-query";
-import { QueryAllowanceRequest, QueryAllowanceResponse, QueryAllowancesRequest, QueryAllowancesResponse, QueryAllowancesByGranterRequest, QueryAllowancesByGranterResponse } from "./query";
-/** Query defines the gRPC querier service. */
+import { grpc } from "@improbable-eng/grpc-web";
+import { UnaryMethodDefinitionish } from "../../../grpc-web";
+import { DeepPartial } from "../../../helpers";
+import { BrowserHeaders } from "browser-headers";
+import { QueryAllowanceRequest, QueryAllowanceRequestSDKType, QueryAllowanceResponse, QueryAllowanceResponseSDKType, QueryAllowancesRequest, QueryAllowancesRequestSDKType, QueryAllowancesResponse, QueryAllowancesResponseSDKType, QueryAllowancesByGranterRequest, QueryAllowancesByGranterRequestSDKType, QueryAllowancesByGranterResponse, QueryAllowancesByGranterResponseSDKType } from "./query";
 
+/** Query defines the gRPC querier service. */
 export interface Query {
   /** Allowance returns fee granted to the grantee by the granter. */
-  allowance(request: QueryAllowanceRequest): Promise<QueryAllowanceResponse>;
-  /** Allowances returns all the grants for address. */
+  allowance(request: DeepPartial<QueryAllowanceRequest>, metadata?: grpc.Metadata): Promise<QueryAllowanceResponse>;
 
-  allowances(request: QueryAllowancesRequest): Promise<QueryAllowancesResponse>;
+  /** Allowances returns all the grants for address. */
+  allowances(request: DeepPartial<QueryAllowancesRequest>, metadata?: grpc.Metadata): Promise<QueryAllowancesResponse>;
+
   /**
    * AllowancesByGranter returns all the grants given by an address
    * Since v0.46
    */
-
-  allowancesByGranter(request: QueryAllowancesByGranterRequest): Promise<QueryAllowancesByGranterResponse>;
+  allowancesByGranter(request: DeepPartial<QueryAllowancesByGranterRequest>, metadata?: grpc.Metadata): Promise<QueryAllowancesByGranterResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
@@ -29,113 +31,140 @@ export class QueryClientImpl implements Query {
     this.allowancesByGranter = this.allowancesByGranter.bind(this);
   }
 
-  allowance(request: QueryAllowanceRequest): Promise<QueryAllowanceResponse> {
-    const data = QueryAllowanceRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.feegrant.v1beta1.Query", "Allowance", data);
-    return promise.then(data => QueryAllowanceResponse.decode(new _m0.Reader(data)));
+  allowance(request: DeepPartial<QueryAllowanceRequest>, metadata?: grpc.Metadata): Promise<QueryAllowanceResponse> {
+    return this.rpc.unary(QueryAllowanceDesc, QueryAllowanceRequest.fromPartial(request), metadata);
   }
 
-  allowances(request: QueryAllowancesRequest): Promise<QueryAllowancesResponse> {
-    const data = QueryAllowancesRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.feegrant.v1beta1.Query", "Allowances", data);
-    return promise.then(data => QueryAllowancesResponse.decode(new _m0.Reader(data)));
+  allowances(request: DeepPartial<QueryAllowancesRequest>, metadata?: grpc.Metadata): Promise<QueryAllowancesResponse> {
+    return this.rpc.unary(QueryAllowancesDesc, QueryAllowancesRequest.fromPartial(request), metadata);
   }
 
-  allowancesByGranter(request: QueryAllowancesByGranterRequest): Promise<QueryAllowancesByGranterResponse> {
-    const data = QueryAllowancesByGranterRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.feegrant.v1beta1.Query", "AllowancesByGranter", data);
-    return promise.then(data => QueryAllowancesByGranterResponse.decode(new _m0.Reader(data)));
+  allowancesByGranter(request: DeepPartial<QueryAllowancesByGranterRequest>, metadata?: grpc.Metadata): Promise<QueryAllowancesByGranterResponse> {
+    return this.rpc.unary(QueryAllowancesByGranterDesc, QueryAllowancesByGranterRequest.fromPartial(request), metadata);
   }
 
 }
-export const createRpcQueryExtension = (base: QueryClient) => {
-  const rpc = createProtobufRpcClient(base);
-  const queryService = new QueryClientImpl(rpc);
-  return {
-    allowance(request: QueryAllowanceRequest): Promise<QueryAllowanceResponse> {
-      return queryService.allowance(request);
-    },
-
-    allowances(request: QueryAllowancesRequest): Promise<QueryAllowancesResponse> {
-      return queryService.allowances(request);
-    },
-
-    allowancesByGranter(request: QueryAllowancesByGranterRequest): Promise<QueryAllowancesByGranterResponse> {
-      return queryService.allowancesByGranter(request);
+export const QueryDesc = {
+  serviceName: "cosmos.feegrant.v1beta1.Query"
+};
+export const QueryAllowanceDesc: UnaryMethodDefinitionish = {
+  methodName: "Allowance",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryAllowanceRequest.encode(this).finish();
     }
 
-  };
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryAllowanceResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
 };
-export interface UseAllowanceQuery<TData> extends ReactQueryParams<QueryAllowanceResponse, TData> {
-  request: QueryAllowanceRequest;
-}
-export interface UseAllowancesQuery<TData> extends ReactQueryParams<QueryAllowancesResponse, TData> {
-  request: QueryAllowancesRequest;
-}
-export interface UseAllowancesByGranterQuery<TData> extends ReactQueryParams<QueryAllowancesByGranterResponse, TData> {
-  request: QueryAllowancesByGranterRequest;
-}
+export const QueryAllowancesDesc: UnaryMethodDefinitionish = {
+  methodName: "Allowances",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryAllowancesRequest.encode(this).finish();
+    }
 
-const _queryClients: WeakMap<ProtobufRpcClient, QueryClientImpl> = new WeakMap();
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryAllowancesResponse.decode(data),
 
-const getQueryService = (rpc: ProtobufRpcClient | undefined): QueryClientImpl | undefined => {
-  if (!rpc) return;
+        toObject() {
+          return this;
+        }
 
-  if (_queryClients.has(rpc)) {
-    return _queryClients.get(rpc);
+      };
+    }
+
+  } as any)
+};
+export const QueryAllowancesByGranterDesc: UnaryMethodDefinitionish = {
+  methodName: "AllowancesByGranter",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryAllowancesByGranterRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryAllowancesByGranterResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export interface Rpc {
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, request: any, metadata: grpc.Metadata | undefined): Promise<any>;
+}
+export class GrpcWebImpl {
+  host: string;
+  options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  };
+
+  constructor(host: string, options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  }) {
+    this.host = host;
+    this.options = options;
   }
 
-  const queryService = new QueryClientImpl(rpc);
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, _request: any, metadata: grpc.Metadata | undefined) {
+    const request = { ..._request,
+      ...methodDesc.requestType
+    };
+    const maybeCombinedMetadata = metadata && this.options.metadata ? new BrowserHeaders({ ...this.options?.metadata.headersMap,
+      ...metadata?.headersMap
+    }) : metadata || this.options.metadata;
+    return new Promise((resolve, reject) => {
+      grpc.unary(methodDesc, {
+        request,
+        host: this.host,
+        metadata: maybeCombinedMetadata,
+        transport: this.options.transport,
+        debug: this.options.debug,
+        onEnd: function (response) {
+          if (response.status === grpc.Code.OK) {
+            resolve(response.message);
+          } else {
+            const err = (new Error(response.statusMessage) as any);
+            err.code = response.status;
+            err.metadata = response.trailers;
+            reject(err);
+          }
+        }
+      });
+    });
+  }
 
-  _queryClients.set(rpc, queryService);
-
-  return queryService;
-};
-
-export const createRpcQueryHooks = (rpc: ProtobufRpcClient | undefined) => {
-  const queryService = getQueryService(rpc);
-
-  const useAllowance = <TData = QueryAllowanceResponse,>({
-    request,
-    options
-  }: UseAllowanceQuery<TData>) => {
-    return useQuery<QueryAllowanceResponse, Error, TData>(["allowanceQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.allowance(request);
-    }, options);
-  };
-
-  const useAllowances = <TData = QueryAllowancesResponse,>({
-    request,
-    options
-  }: UseAllowancesQuery<TData>) => {
-    return useQuery<QueryAllowancesResponse, Error, TData>(["allowancesQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.allowances(request);
-    }, options);
-  };
-
-  const useAllowancesByGranter = <TData = QueryAllowancesByGranterResponse,>({
-    request,
-    options
-  }: UseAllowancesByGranterQuery<TData>) => {
-    return useQuery<QueryAllowancesByGranterResponse, Error, TData>(["allowancesByGranterQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.allowancesByGranter(request);
-    }, options);
-  };
-
-  return {
-    /** Allowance returns fee granted to the grantee by the granter. */
-    useAllowance,
-
-    /** Allowances returns all the grants for address. */
-    useAllowances,
-
-    /**
-     * AllowancesByGranter returns all the grants given by an address
-     * Since v0.46
-     */
-    useAllowancesByGranter
-  };
-};
+}

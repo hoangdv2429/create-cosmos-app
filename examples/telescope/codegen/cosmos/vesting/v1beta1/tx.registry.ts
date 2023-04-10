@@ -1,5 +1,7 @@
+import { Coin, CoinSDKType } from "../../base/v1beta1/coin";
+import { Period, PeriodSDKType } from "./vesting";
 import { GeneratedType, Registry } from "@cosmjs/proto-signing";
-import { MsgCreateVestingAccount, MsgCreatePermanentLockedAccount, MsgCreatePeriodicVestingAccount } from "./tx";
+import { MsgCreateVestingAccount, MsgCreateVestingAccountSDKType, MsgCreatePermanentLockedAccount, MsgCreatePermanentLockedAccountSDKType, MsgCreatePeriodicVestingAccount, MsgCreatePeriodicVestingAccountSDKType } from "./tx";
 export const registry: ReadonlyArray<[string, GeneratedType]> = [["/cosmos.vesting.v1beta1.MsgCreateVestingAccount", MsgCreateVestingAccount], ["/cosmos.vesting.v1beta1.MsgCreatePermanentLockedAccount", MsgCreatePermanentLockedAccount], ["/cosmos.vesting.v1beta1.MsgCreatePeriodicVestingAccount", MsgCreatePeriodicVestingAccount]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
@@ -49,6 +51,52 @@ export const MessageComposer = {
       return {
         typeUrl: "/cosmos.vesting.v1beta1.MsgCreatePeriodicVestingAccount",
         value
+      };
+    }
+
+  },
+  toJSON: {
+    createVestingAccount(value: MsgCreateVestingAccount) {
+      return {
+        typeUrl: "/cosmos.vesting.v1beta1.MsgCreateVestingAccount",
+        value: MsgCreateVestingAccount.toJSON(value)
+      };
+    },
+
+    createPermanentLockedAccount(value: MsgCreatePermanentLockedAccount) {
+      return {
+        typeUrl: "/cosmos.vesting.v1beta1.MsgCreatePermanentLockedAccount",
+        value: MsgCreatePermanentLockedAccount.toJSON(value)
+      };
+    },
+
+    createPeriodicVestingAccount(value: MsgCreatePeriodicVestingAccount) {
+      return {
+        typeUrl: "/cosmos.vesting.v1beta1.MsgCreatePeriodicVestingAccount",
+        value: MsgCreatePeriodicVestingAccount.toJSON(value)
+      };
+    }
+
+  },
+  fromJSON: {
+    createVestingAccount(value: any) {
+      return {
+        typeUrl: "/cosmos.vesting.v1beta1.MsgCreateVestingAccount",
+        value: MsgCreateVestingAccount.fromJSON(value)
+      };
+    },
+
+    createPermanentLockedAccount(value: any) {
+      return {
+        typeUrl: "/cosmos.vesting.v1beta1.MsgCreatePermanentLockedAccount",
+        value: MsgCreatePermanentLockedAccount.fromJSON(value)
+      };
+    },
+
+    createPeriodicVestingAccount(value: any) {
+      return {
+        typeUrl: "/cosmos.vesting.v1beta1.MsgCreatePeriodicVestingAccount",
+        value: MsgCreatePeriodicVestingAccount.fromJSON(value)
       };
     }
 

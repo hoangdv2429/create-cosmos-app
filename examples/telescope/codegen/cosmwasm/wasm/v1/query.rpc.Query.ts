@@ -1,38 +1,40 @@
-import { Rpc } from "../../../helpers";
+import { PageRequest, PageRequestSDKType, PageResponse, PageResponseSDKType } from "../../../cosmos/base/query/v1beta1/pagination";
+import { ContractInfo, ContractInfoSDKType, ContractCodeHistoryEntry, ContractCodeHistoryEntrySDKType, Model, ModelSDKType } from "./types";
 import * as _m0 from "protobufjs/minimal";
-import { QueryClient, createProtobufRpcClient, ProtobufRpcClient } from "@cosmjs/stargate";
-import { ReactQueryParams } from "../../../react-query";
-import { useQuery } from "@tanstack/react-query";
-import { QueryContractInfoRequest, QueryContractInfoResponse, QueryContractHistoryRequest, QueryContractHistoryResponse, QueryContractsByCodeRequest, QueryContractsByCodeResponse, QueryAllContractStateRequest, QueryAllContractStateResponse, QueryRawContractStateRequest, QueryRawContractStateResponse, QuerySmartContractStateRequest, QuerySmartContractStateResponse, QueryCodeRequest, QueryCodeResponse, QueryCodesRequest, QueryCodesResponse, QueryPinnedCodesRequest, QueryPinnedCodesResponse } from "./query";
-/** Query provides defines the gRPC querier service */
+import { grpc } from "@improbable-eng/grpc-web";
+import { UnaryMethodDefinitionish } from "../../../grpc-web";
+import { DeepPartial } from "../../../helpers";
+import { BrowserHeaders } from "browser-headers";
+import { QueryContractInfoRequest, QueryContractInfoRequestSDKType, QueryContractInfoResponse, QueryContractInfoResponseSDKType, QueryContractHistoryRequest, QueryContractHistoryRequestSDKType, QueryContractHistoryResponse, QueryContractHistoryResponseSDKType, QueryContractsByCodeRequest, QueryContractsByCodeRequestSDKType, QueryContractsByCodeResponse, QueryContractsByCodeResponseSDKType, QueryAllContractStateRequest, QueryAllContractStateRequestSDKType, QueryAllContractStateResponse, QueryAllContractStateResponseSDKType, QueryRawContractStateRequest, QueryRawContractStateRequestSDKType, QueryRawContractStateResponse, QueryRawContractStateResponseSDKType, QuerySmartContractStateRequest, QuerySmartContractStateRequestSDKType, QuerySmartContractStateResponse, QuerySmartContractStateResponseSDKType, QueryCodeRequest, QueryCodeRequestSDKType, QueryCodeResponse, QueryCodeResponseSDKType, QueryCodesRequest, QueryCodesRequestSDKType, QueryCodesResponse, QueryCodesResponseSDKType, QueryPinnedCodesRequest, QueryPinnedCodesRequestSDKType, QueryPinnedCodesResponse, QueryPinnedCodesResponseSDKType } from "./query";
 
+/** Query provides defines the gRPC querier service */
 export interface Query {
   /** ContractInfo gets the contract meta data */
-  contractInfo(request: QueryContractInfoRequest): Promise<QueryContractInfoResponse>;
+  contractInfo(request: DeepPartial<QueryContractInfoRequest>, metadata?: grpc.Metadata): Promise<QueryContractInfoResponse>;
+
   /** ContractHistory gets the contract code history */
+  contractHistory(request: DeepPartial<QueryContractHistoryRequest>, metadata?: grpc.Metadata): Promise<QueryContractHistoryResponse>;
 
-  contractHistory(request: QueryContractHistoryRequest): Promise<QueryContractHistoryResponse>;
   /** ContractsByCode lists all smart contracts for a code id */
+  contractsByCode(request: DeepPartial<QueryContractsByCodeRequest>, metadata?: grpc.Metadata): Promise<QueryContractsByCodeResponse>;
 
-  contractsByCode(request: QueryContractsByCodeRequest): Promise<QueryContractsByCodeResponse>;
   /** AllContractState gets all raw store data for a single contract */
+  allContractState(request: DeepPartial<QueryAllContractStateRequest>, metadata?: grpc.Metadata): Promise<QueryAllContractStateResponse>;
 
-  allContractState(request: QueryAllContractStateRequest): Promise<QueryAllContractStateResponse>;
   /** RawContractState gets single key from the raw store data of a contract */
+  rawContractState(request: DeepPartial<QueryRawContractStateRequest>, metadata?: grpc.Metadata): Promise<QueryRawContractStateResponse>;
 
-  rawContractState(request: QueryRawContractStateRequest): Promise<QueryRawContractStateResponse>;
   /** SmartContractState get smart query result from the contract */
+  smartContractState(request: DeepPartial<QuerySmartContractStateRequest>, metadata?: grpc.Metadata): Promise<QuerySmartContractStateResponse>;
 
-  smartContractState(request: QuerySmartContractStateRequest): Promise<QuerySmartContractStateResponse>;
   /** Code gets the binary code and metadata for a singe wasm code */
+  code(request: DeepPartial<QueryCodeRequest>, metadata?: grpc.Metadata): Promise<QueryCodeResponse>;
 
-  code(request: QueryCodeRequest): Promise<QueryCodeResponse>;
   /** Codes gets the metadata for all stored wasm codes */
+  codes(request?: DeepPartial<QueryCodesRequest>, metadata?: grpc.Metadata): Promise<QueryCodesResponse>;
 
-  codes(request?: QueryCodesRequest): Promise<QueryCodesResponse>;
   /** PinnedCodes gets the pinned code ids */
-
-  pinnedCodes(request?: QueryPinnedCodesRequest): Promise<QueryPinnedCodesResponse>;
+  pinnedCodes(request?: DeepPartial<QueryPinnedCodesRequest>, metadata?: grpc.Metadata): Promise<QueryPinnedCodesResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
@@ -50,270 +52,312 @@ export class QueryClientImpl implements Query {
     this.pinnedCodes = this.pinnedCodes.bind(this);
   }
 
-  contractInfo(request: QueryContractInfoRequest): Promise<QueryContractInfoResponse> {
-    const data = QueryContractInfoRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmwasm.wasm.v1.Query", "ContractInfo", data);
-    return promise.then(data => QueryContractInfoResponse.decode(new _m0.Reader(data)));
+  contractInfo(request: DeepPartial<QueryContractInfoRequest>, metadata?: grpc.Metadata): Promise<QueryContractInfoResponse> {
+    return this.rpc.unary(QueryContractInfoDesc, QueryContractInfoRequest.fromPartial(request), metadata);
   }
 
-  contractHistory(request: QueryContractHistoryRequest): Promise<QueryContractHistoryResponse> {
-    const data = QueryContractHistoryRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmwasm.wasm.v1.Query", "ContractHistory", data);
-    return promise.then(data => QueryContractHistoryResponse.decode(new _m0.Reader(data)));
+  contractHistory(request: DeepPartial<QueryContractHistoryRequest>, metadata?: grpc.Metadata): Promise<QueryContractHistoryResponse> {
+    return this.rpc.unary(QueryContractHistoryDesc, QueryContractHistoryRequest.fromPartial(request), metadata);
   }
 
-  contractsByCode(request: QueryContractsByCodeRequest): Promise<QueryContractsByCodeResponse> {
-    const data = QueryContractsByCodeRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmwasm.wasm.v1.Query", "ContractsByCode", data);
-    return promise.then(data => QueryContractsByCodeResponse.decode(new _m0.Reader(data)));
+  contractsByCode(request: DeepPartial<QueryContractsByCodeRequest>, metadata?: grpc.Metadata): Promise<QueryContractsByCodeResponse> {
+    return this.rpc.unary(QueryContractsByCodeDesc, QueryContractsByCodeRequest.fromPartial(request), metadata);
   }
 
-  allContractState(request: QueryAllContractStateRequest): Promise<QueryAllContractStateResponse> {
-    const data = QueryAllContractStateRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmwasm.wasm.v1.Query", "AllContractState", data);
-    return promise.then(data => QueryAllContractStateResponse.decode(new _m0.Reader(data)));
+  allContractState(request: DeepPartial<QueryAllContractStateRequest>, metadata?: grpc.Metadata): Promise<QueryAllContractStateResponse> {
+    return this.rpc.unary(QueryAllContractStateDesc, QueryAllContractStateRequest.fromPartial(request), metadata);
   }
 
-  rawContractState(request: QueryRawContractStateRequest): Promise<QueryRawContractStateResponse> {
-    const data = QueryRawContractStateRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmwasm.wasm.v1.Query", "RawContractState", data);
-    return promise.then(data => QueryRawContractStateResponse.decode(new _m0.Reader(data)));
+  rawContractState(request: DeepPartial<QueryRawContractStateRequest>, metadata?: grpc.Metadata): Promise<QueryRawContractStateResponse> {
+    return this.rpc.unary(QueryRawContractStateDesc, QueryRawContractStateRequest.fromPartial(request), metadata);
   }
 
-  smartContractState(request: QuerySmartContractStateRequest): Promise<QuerySmartContractStateResponse> {
-    const data = QuerySmartContractStateRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmwasm.wasm.v1.Query", "SmartContractState", data);
-    return promise.then(data => QuerySmartContractStateResponse.decode(new _m0.Reader(data)));
+  smartContractState(request: DeepPartial<QuerySmartContractStateRequest>, metadata?: grpc.Metadata): Promise<QuerySmartContractStateResponse> {
+    return this.rpc.unary(QuerySmartContractStateDesc, QuerySmartContractStateRequest.fromPartial(request), metadata);
   }
 
-  code(request: QueryCodeRequest): Promise<QueryCodeResponse> {
-    const data = QueryCodeRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmwasm.wasm.v1.Query", "Code", data);
-    return promise.then(data => QueryCodeResponse.decode(new _m0.Reader(data)));
+  code(request: DeepPartial<QueryCodeRequest>, metadata?: grpc.Metadata): Promise<QueryCodeResponse> {
+    return this.rpc.unary(QueryCodeDesc, QueryCodeRequest.fromPartial(request), metadata);
   }
 
-  codes(request: QueryCodesRequest = {
+  codes(request: DeepPartial<QueryCodesRequest> = {
     pagination: undefined
-  }): Promise<QueryCodesResponse> {
-    const data = QueryCodesRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmwasm.wasm.v1.Query", "Codes", data);
-    return promise.then(data => QueryCodesResponse.decode(new _m0.Reader(data)));
+  }, metadata?: grpc.Metadata): Promise<QueryCodesResponse> {
+    return this.rpc.unary(QueryCodesDesc, QueryCodesRequest.fromPartial(request), metadata);
   }
 
-  pinnedCodes(request: QueryPinnedCodesRequest = {
+  pinnedCodes(request: DeepPartial<QueryPinnedCodesRequest> = {
     pagination: undefined
-  }): Promise<QueryPinnedCodesResponse> {
-    const data = QueryPinnedCodesRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmwasm.wasm.v1.Query", "PinnedCodes", data);
-    return promise.then(data => QueryPinnedCodesResponse.decode(new _m0.Reader(data)));
+  }, metadata?: grpc.Metadata): Promise<QueryPinnedCodesResponse> {
+    return this.rpc.unary(QueryPinnedCodesDesc, QueryPinnedCodesRequest.fromPartial(request), metadata);
   }
 
 }
-export const createRpcQueryExtension = (base: QueryClient) => {
-  const rpc = createProtobufRpcClient(base);
-  const queryService = new QueryClientImpl(rpc);
-  return {
-    contractInfo(request: QueryContractInfoRequest): Promise<QueryContractInfoResponse> {
-      return queryService.contractInfo(request);
-    },
-
-    contractHistory(request: QueryContractHistoryRequest): Promise<QueryContractHistoryResponse> {
-      return queryService.contractHistory(request);
-    },
-
-    contractsByCode(request: QueryContractsByCodeRequest): Promise<QueryContractsByCodeResponse> {
-      return queryService.contractsByCode(request);
-    },
-
-    allContractState(request: QueryAllContractStateRequest): Promise<QueryAllContractStateResponse> {
-      return queryService.allContractState(request);
-    },
-
-    rawContractState(request: QueryRawContractStateRequest): Promise<QueryRawContractStateResponse> {
-      return queryService.rawContractState(request);
-    },
-
-    smartContractState(request: QuerySmartContractStateRequest): Promise<QuerySmartContractStateResponse> {
-      return queryService.smartContractState(request);
-    },
-
-    code(request: QueryCodeRequest): Promise<QueryCodeResponse> {
-      return queryService.code(request);
-    },
-
-    codes(request?: QueryCodesRequest): Promise<QueryCodesResponse> {
-      return queryService.codes(request);
-    },
-
-    pinnedCodes(request?: QueryPinnedCodesRequest): Promise<QueryPinnedCodesResponse> {
-      return queryService.pinnedCodes(request);
+export const QueryDesc = {
+  serviceName: "cosmwasm.wasm.v1.Query"
+};
+export const QueryContractInfoDesc: UnaryMethodDefinitionish = {
+  methodName: "ContractInfo",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryContractInfoRequest.encode(this).finish();
     }
 
-  };
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryContractInfoResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
 };
-export interface UseContractInfoQuery<TData> extends ReactQueryParams<QueryContractInfoResponse, TData> {
-  request: QueryContractInfoRequest;
-}
-export interface UseContractHistoryQuery<TData> extends ReactQueryParams<QueryContractHistoryResponse, TData> {
-  request: QueryContractHistoryRequest;
-}
-export interface UseContractsByCodeQuery<TData> extends ReactQueryParams<QueryContractsByCodeResponse, TData> {
-  request: QueryContractsByCodeRequest;
-}
-export interface UseAllContractStateQuery<TData> extends ReactQueryParams<QueryAllContractStateResponse, TData> {
-  request: QueryAllContractStateRequest;
-}
-export interface UseRawContractStateQuery<TData> extends ReactQueryParams<QueryRawContractStateResponse, TData> {
-  request: QueryRawContractStateRequest;
-}
-export interface UseSmartContractStateQuery<TData> extends ReactQueryParams<QuerySmartContractStateResponse, TData> {
-  request: QuerySmartContractStateRequest;
-}
-export interface UseCodeQuery<TData> extends ReactQueryParams<QueryCodeResponse, TData> {
-  request: QueryCodeRequest;
-}
-export interface UseCodesQuery<TData> extends ReactQueryParams<QueryCodesResponse, TData> {
-  request?: QueryCodesRequest;
-}
-export interface UsePinnedCodesQuery<TData> extends ReactQueryParams<QueryPinnedCodesResponse, TData> {
-  request?: QueryPinnedCodesRequest;
-}
+export const QueryContractHistoryDesc: UnaryMethodDefinitionish = {
+  methodName: "ContractHistory",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryContractHistoryRequest.encode(this).finish();
+    }
 
-const _queryClients: WeakMap<ProtobufRpcClient, QueryClientImpl> = new WeakMap();
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryContractHistoryResponse.decode(data),
 
-const getQueryService = (rpc: ProtobufRpcClient | undefined): QueryClientImpl | undefined => {
-  if (!rpc) return;
+        toObject() {
+          return this;
+        }
 
-  if (_queryClients.has(rpc)) {
-    return _queryClients.get(rpc);
+      };
+    }
+
+  } as any)
+};
+export const QueryContractsByCodeDesc: UnaryMethodDefinitionish = {
+  methodName: "ContractsByCode",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryContractsByCodeRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryContractsByCodeResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryAllContractStateDesc: UnaryMethodDefinitionish = {
+  methodName: "AllContractState",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryAllContractStateRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryAllContractStateResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryRawContractStateDesc: UnaryMethodDefinitionish = {
+  methodName: "RawContractState",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryRawContractStateRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryRawContractStateResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QuerySmartContractStateDesc: UnaryMethodDefinitionish = {
+  methodName: "SmartContractState",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QuerySmartContractStateRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QuerySmartContractStateResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryCodeDesc: UnaryMethodDefinitionish = {
+  methodName: "Code",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryCodeRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryCodeResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryCodesDesc: UnaryMethodDefinitionish = {
+  methodName: "Codes",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryCodesRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryCodesResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryPinnedCodesDesc: UnaryMethodDefinitionish = {
+  methodName: "PinnedCodes",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryPinnedCodesRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryPinnedCodesResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export interface Rpc {
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, request: any, metadata: grpc.Metadata | undefined): Promise<any>;
+}
+export class GrpcWebImpl {
+  host: string;
+  options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  };
+
+  constructor(host: string, options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  }) {
+    this.host = host;
+    this.options = options;
   }
 
-  const queryService = new QueryClientImpl(rpc);
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, _request: any, metadata: grpc.Metadata | undefined) {
+    const request = { ..._request,
+      ...methodDesc.requestType
+    };
+    const maybeCombinedMetadata = metadata && this.options.metadata ? new BrowserHeaders({ ...this.options?.metadata.headersMap,
+      ...metadata?.headersMap
+    }) : metadata || this.options.metadata;
+    return new Promise((resolve, reject) => {
+      grpc.unary(methodDesc, {
+        request,
+        host: this.host,
+        metadata: maybeCombinedMetadata,
+        transport: this.options.transport,
+        debug: this.options.debug,
+        onEnd: function (response) {
+          if (response.status === grpc.Code.OK) {
+            resolve(response.message);
+          } else {
+            const err = (new Error(response.statusMessage) as any);
+            err.code = response.status;
+            err.metadata = response.trailers;
+            reject(err);
+          }
+        }
+      });
+    });
+  }
 
-  _queryClients.set(rpc, queryService);
-
-  return queryService;
-};
-
-export const createRpcQueryHooks = (rpc: ProtobufRpcClient | undefined) => {
-  const queryService = getQueryService(rpc);
-
-  const useContractInfo = <TData = QueryContractInfoResponse,>({
-    request,
-    options
-  }: UseContractInfoQuery<TData>) => {
-    return useQuery<QueryContractInfoResponse, Error, TData>(["contractInfoQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.contractInfo(request);
-    }, options);
-  };
-
-  const useContractHistory = <TData = QueryContractHistoryResponse,>({
-    request,
-    options
-  }: UseContractHistoryQuery<TData>) => {
-    return useQuery<QueryContractHistoryResponse, Error, TData>(["contractHistoryQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.contractHistory(request);
-    }, options);
-  };
-
-  const useContractsByCode = <TData = QueryContractsByCodeResponse,>({
-    request,
-    options
-  }: UseContractsByCodeQuery<TData>) => {
-    return useQuery<QueryContractsByCodeResponse, Error, TData>(["contractsByCodeQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.contractsByCode(request);
-    }, options);
-  };
-
-  const useAllContractState = <TData = QueryAllContractStateResponse,>({
-    request,
-    options
-  }: UseAllContractStateQuery<TData>) => {
-    return useQuery<QueryAllContractStateResponse, Error, TData>(["allContractStateQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.allContractState(request);
-    }, options);
-  };
-
-  const useRawContractState = <TData = QueryRawContractStateResponse,>({
-    request,
-    options
-  }: UseRawContractStateQuery<TData>) => {
-    return useQuery<QueryRawContractStateResponse, Error, TData>(["rawContractStateQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.rawContractState(request);
-    }, options);
-  };
-
-  const useSmartContractState = <TData = QuerySmartContractStateResponse,>({
-    request,
-    options
-  }: UseSmartContractStateQuery<TData>) => {
-    return useQuery<QuerySmartContractStateResponse, Error, TData>(["smartContractStateQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.smartContractState(request);
-    }, options);
-  };
-
-  const useCode = <TData = QueryCodeResponse,>({
-    request,
-    options
-  }: UseCodeQuery<TData>) => {
-    return useQuery<QueryCodeResponse, Error, TData>(["codeQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.code(request);
-    }, options);
-  };
-
-  const useCodes = <TData = QueryCodesResponse,>({
-    request,
-    options
-  }: UseCodesQuery<TData>) => {
-    return useQuery<QueryCodesResponse, Error, TData>(["codesQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.codes(request);
-    }, options);
-  };
-
-  const usePinnedCodes = <TData = QueryPinnedCodesResponse,>({
-    request,
-    options
-  }: UsePinnedCodesQuery<TData>) => {
-    return useQuery<QueryPinnedCodesResponse, Error, TData>(["pinnedCodesQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.pinnedCodes(request);
-    }, options);
-  };
-
-  return {
-    /** ContractInfo gets the contract meta data */
-    useContractInfo,
-
-    /** ContractHistory gets the contract code history */
-    useContractHistory,
-
-    /** ContractsByCode lists all smart contracts for a code id */
-    useContractsByCode,
-
-    /** AllContractState gets all raw store data for a single contract */
-    useAllContractState,
-
-    /** RawContractState gets single key from the raw store data of a contract */
-    useRawContractState,
-
-    /** SmartContractState get smart query result from the contract */
-    useSmartContractState,
-
-    /** Code gets the binary code and metadata for a singe wasm code */
-    useCode,
-
-    /** Codes gets the metadata for all stored wasm codes */
-    useCodes,
-
-    /** PinnedCodes gets the pinned code ids */
-    usePinnedCodes
-  };
-};
+}

@@ -1,35 +1,39 @@
-import { Rpc } from "../../../../helpers";
+import { PageRequest, PageRequestSDKType, PageResponse, PageResponseSDKType } from "../../../../cosmos/base/query/v1beta1/pagination";
+import { ConnectionEnd, ConnectionEndSDKType, IdentifiedConnection, IdentifiedConnectionSDKType } from "./connection";
+import { Height, HeightSDKType, IdentifiedClientState, IdentifiedClientStateSDKType } from "../../client/v1/client";
+import { Any, AnyProtoMsg, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
 import * as _m0 from "protobufjs/minimal";
-import { QueryClient, createProtobufRpcClient, ProtobufRpcClient } from "@cosmjs/stargate";
-import { ReactQueryParams } from "../../../../react-query";
-import { useQuery } from "@tanstack/react-query";
-import { QueryConnectionRequest, QueryConnectionResponse, QueryConnectionsRequest, QueryConnectionsResponse, QueryClientConnectionsRequest, QueryClientConnectionsResponse, QueryConnectionClientStateRequest, QueryConnectionClientStateResponse, QueryConnectionConsensusStateRequest, QueryConnectionConsensusStateResponse } from "./query";
-/** Query provides defines the gRPC querier service */
+import { grpc } from "@improbable-eng/grpc-web";
+import { UnaryMethodDefinitionish } from "../../../../grpc-web";
+import { DeepPartial } from "../../../../helpers";
+import { BrowserHeaders } from "browser-headers";
+import { QueryConnectionRequest, QueryConnectionRequestSDKType, QueryConnectionResponse, QueryConnectionResponseSDKType, QueryConnectionsRequest, QueryConnectionsRequestSDKType, QueryConnectionsResponse, QueryConnectionsResponseSDKType, QueryClientConnectionsRequest, QueryClientConnectionsRequestSDKType, QueryClientConnectionsResponse, QueryClientConnectionsResponseSDKType, QueryConnectionClientStateRequest, QueryConnectionClientStateRequestSDKType, QueryConnectionClientStateResponse, QueryConnectionClientStateResponseSDKType, QueryConnectionConsensusStateRequest, QueryConnectionConsensusStateRequestSDKType, QueryConnectionConsensusStateResponse, QueryConnectionConsensusStateResponseSDKType } from "./query";
 
+/** Query provides defines the gRPC querier service */
 export interface Query {
   /** Connection queries an IBC connection end. */
-  connection(request: QueryConnectionRequest): Promise<QueryConnectionResponse>;
-  /** Connections queries all the IBC connections of a chain. */
+  connection(request: DeepPartial<QueryConnectionRequest>, metadata?: grpc.Metadata): Promise<QueryConnectionResponse>;
 
-  connections(request?: QueryConnectionsRequest): Promise<QueryConnectionsResponse>;
+  /** Connections queries all the IBC connections of a chain. */
+  connections(request?: DeepPartial<QueryConnectionsRequest>, metadata?: grpc.Metadata): Promise<QueryConnectionsResponse>;
+
   /**
    * ClientConnections queries the connection paths associated with a client
    * state.
    */
+  clientConnections(request: DeepPartial<QueryClientConnectionsRequest>, metadata?: grpc.Metadata): Promise<QueryClientConnectionsResponse>;
 
-  clientConnections(request: QueryClientConnectionsRequest): Promise<QueryClientConnectionsResponse>;
   /**
    * ConnectionClientState queries the client state associated with the
    * connection.
    */
+  connectionClientState(request: DeepPartial<QueryConnectionClientStateRequest>, metadata?: grpc.Metadata): Promise<QueryConnectionClientStateResponse>;
 
-  connectionClientState(request: QueryConnectionClientStateRequest): Promise<QueryConnectionClientStateResponse>;
   /**
    * ConnectionConsensusState queries the consensus state associated with the
    * connection.
    */
-
-  connectionConsensusState(request: QueryConnectionConsensusStateRequest): Promise<QueryConnectionConsensusStateResponse>;
+  connectionConsensusState(request: DeepPartial<QueryConnectionConsensusStateRequest>, metadata?: grpc.Metadata): Promise<QueryConnectionConsensusStateResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
@@ -43,173 +47,198 @@ export class QueryClientImpl implements Query {
     this.connectionConsensusState = this.connectionConsensusState.bind(this);
   }
 
-  connection(request: QueryConnectionRequest): Promise<QueryConnectionResponse> {
-    const data = QueryConnectionRequest.encode(request).finish();
-    const promise = this.rpc.request("ibc.core.connection.v1.Query", "Connection", data);
-    return promise.then(data => QueryConnectionResponse.decode(new _m0.Reader(data)));
+  connection(request: DeepPartial<QueryConnectionRequest>, metadata?: grpc.Metadata): Promise<QueryConnectionResponse> {
+    return this.rpc.unary(QueryConnectionDesc, QueryConnectionRequest.fromPartial(request), metadata);
   }
 
-  connections(request: QueryConnectionsRequest = {
+  connections(request: DeepPartial<QueryConnectionsRequest> = {
     pagination: undefined
-  }): Promise<QueryConnectionsResponse> {
-    const data = QueryConnectionsRequest.encode(request).finish();
-    const promise = this.rpc.request("ibc.core.connection.v1.Query", "Connections", data);
-    return promise.then(data => QueryConnectionsResponse.decode(new _m0.Reader(data)));
+  }, metadata?: grpc.Metadata): Promise<QueryConnectionsResponse> {
+    return this.rpc.unary(QueryConnectionsDesc, QueryConnectionsRequest.fromPartial(request), metadata);
   }
 
-  clientConnections(request: QueryClientConnectionsRequest): Promise<QueryClientConnectionsResponse> {
-    const data = QueryClientConnectionsRequest.encode(request).finish();
-    const promise = this.rpc.request("ibc.core.connection.v1.Query", "ClientConnections", data);
-    return promise.then(data => QueryClientConnectionsResponse.decode(new _m0.Reader(data)));
+  clientConnections(request: DeepPartial<QueryClientConnectionsRequest>, metadata?: grpc.Metadata): Promise<QueryClientConnectionsResponse> {
+    return this.rpc.unary(QueryClientConnectionsDesc, QueryClientConnectionsRequest.fromPartial(request), metadata);
   }
 
-  connectionClientState(request: QueryConnectionClientStateRequest): Promise<QueryConnectionClientStateResponse> {
-    const data = QueryConnectionClientStateRequest.encode(request).finish();
-    const promise = this.rpc.request("ibc.core.connection.v1.Query", "ConnectionClientState", data);
-    return promise.then(data => QueryConnectionClientStateResponse.decode(new _m0.Reader(data)));
+  connectionClientState(request: DeepPartial<QueryConnectionClientStateRequest>, metadata?: grpc.Metadata): Promise<QueryConnectionClientStateResponse> {
+    return this.rpc.unary(QueryConnectionClientStateDesc, QueryConnectionClientStateRequest.fromPartial(request), metadata);
   }
 
-  connectionConsensusState(request: QueryConnectionConsensusStateRequest): Promise<QueryConnectionConsensusStateResponse> {
-    const data = QueryConnectionConsensusStateRequest.encode(request).finish();
-    const promise = this.rpc.request("ibc.core.connection.v1.Query", "ConnectionConsensusState", data);
-    return promise.then(data => QueryConnectionConsensusStateResponse.decode(new _m0.Reader(data)));
+  connectionConsensusState(request: DeepPartial<QueryConnectionConsensusStateRequest>, metadata?: grpc.Metadata): Promise<QueryConnectionConsensusStateResponse> {
+    return this.rpc.unary(QueryConnectionConsensusStateDesc, QueryConnectionConsensusStateRequest.fromPartial(request), metadata);
   }
 
 }
-export const createRpcQueryExtension = (base: QueryClient) => {
-  const rpc = createProtobufRpcClient(base);
-  const queryService = new QueryClientImpl(rpc);
-  return {
-    connection(request: QueryConnectionRequest): Promise<QueryConnectionResponse> {
-      return queryService.connection(request);
-    },
-
-    connections(request?: QueryConnectionsRequest): Promise<QueryConnectionsResponse> {
-      return queryService.connections(request);
-    },
-
-    clientConnections(request: QueryClientConnectionsRequest): Promise<QueryClientConnectionsResponse> {
-      return queryService.clientConnections(request);
-    },
-
-    connectionClientState(request: QueryConnectionClientStateRequest): Promise<QueryConnectionClientStateResponse> {
-      return queryService.connectionClientState(request);
-    },
-
-    connectionConsensusState(request: QueryConnectionConsensusStateRequest): Promise<QueryConnectionConsensusStateResponse> {
-      return queryService.connectionConsensusState(request);
+export const QueryDesc = {
+  serviceName: "ibc.core.connection.v1.Query"
+};
+export const QueryConnectionDesc: UnaryMethodDefinitionish = {
+  methodName: "Connection",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryConnectionRequest.encode(this).finish();
     }
 
-  };
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryConnectionResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
 };
-export interface UseConnectionQuery<TData> extends ReactQueryParams<QueryConnectionResponse, TData> {
-  request: QueryConnectionRequest;
-}
-export interface UseConnectionsQuery<TData> extends ReactQueryParams<QueryConnectionsResponse, TData> {
-  request?: QueryConnectionsRequest;
-}
-export interface UseClientConnectionsQuery<TData> extends ReactQueryParams<QueryClientConnectionsResponse, TData> {
-  request: QueryClientConnectionsRequest;
-}
-export interface UseConnectionClientStateQuery<TData> extends ReactQueryParams<QueryConnectionClientStateResponse, TData> {
-  request: QueryConnectionClientStateRequest;
-}
-export interface UseConnectionConsensusStateQuery<TData> extends ReactQueryParams<QueryConnectionConsensusStateResponse, TData> {
-  request: QueryConnectionConsensusStateRequest;
-}
+export const QueryConnectionsDesc: UnaryMethodDefinitionish = {
+  methodName: "Connections",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryConnectionsRequest.encode(this).finish();
+    }
 
-const _queryClients: WeakMap<ProtobufRpcClient, QueryClientImpl> = new WeakMap();
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryConnectionsResponse.decode(data),
 
-const getQueryService = (rpc: ProtobufRpcClient | undefined): QueryClientImpl | undefined => {
-  if (!rpc) return;
+        toObject() {
+          return this;
+        }
 
-  if (_queryClients.has(rpc)) {
-    return _queryClients.get(rpc);
+      };
+    }
+
+  } as any)
+};
+export const QueryClientConnectionsDesc: UnaryMethodDefinitionish = {
+  methodName: "ClientConnections",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryClientConnectionsRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryClientConnectionsResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryConnectionClientStateDesc: UnaryMethodDefinitionish = {
+  methodName: "ConnectionClientState",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryConnectionClientStateRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryConnectionClientStateResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryConnectionConsensusStateDesc: UnaryMethodDefinitionish = {
+  methodName: "ConnectionConsensusState",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryConnectionConsensusStateRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryConnectionConsensusStateResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export interface Rpc {
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, request: any, metadata: grpc.Metadata | undefined): Promise<any>;
+}
+export class GrpcWebImpl {
+  host: string;
+  options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  };
+
+  constructor(host: string, options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  }) {
+    this.host = host;
+    this.options = options;
   }
 
-  const queryService = new QueryClientImpl(rpc);
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, _request: any, metadata: grpc.Metadata | undefined) {
+    const request = { ..._request,
+      ...methodDesc.requestType
+    };
+    const maybeCombinedMetadata = metadata && this.options.metadata ? new BrowserHeaders({ ...this.options?.metadata.headersMap,
+      ...metadata?.headersMap
+    }) : metadata || this.options.metadata;
+    return new Promise((resolve, reject) => {
+      grpc.unary(methodDesc, {
+        request,
+        host: this.host,
+        metadata: maybeCombinedMetadata,
+        transport: this.options.transport,
+        debug: this.options.debug,
+        onEnd: function (response) {
+          if (response.status === grpc.Code.OK) {
+            resolve(response.message);
+          } else {
+            const err = (new Error(response.statusMessage) as any);
+            err.code = response.status;
+            err.metadata = response.trailers;
+            reject(err);
+          }
+        }
+      });
+    });
+  }
 
-  _queryClients.set(rpc, queryService);
-
-  return queryService;
-};
-
-export const createRpcQueryHooks = (rpc: ProtobufRpcClient | undefined) => {
-  const queryService = getQueryService(rpc);
-
-  const useConnection = <TData = QueryConnectionResponse,>({
-    request,
-    options
-  }: UseConnectionQuery<TData>) => {
-    return useQuery<QueryConnectionResponse, Error, TData>(["connectionQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.connection(request);
-    }, options);
-  };
-
-  const useConnections = <TData = QueryConnectionsResponse,>({
-    request,
-    options
-  }: UseConnectionsQuery<TData>) => {
-    return useQuery<QueryConnectionsResponse, Error, TData>(["connectionsQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.connections(request);
-    }, options);
-  };
-
-  const useClientConnections = <TData = QueryClientConnectionsResponse,>({
-    request,
-    options
-  }: UseClientConnectionsQuery<TData>) => {
-    return useQuery<QueryClientConnectionsResponse, Error, TData>(["clientConnectionsQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.clientConnections(request);
-    }, options);
-  };
-
-  const useConnectionClientState = <TData = QueryConnectionClientStateResponse,>({
-    request,
-    options
-  }: UseConnectionClientStateQuery<TData>) => {
-    return useQuery<QueryConnectionClientStateResponse, Error, TData>(["connectionClientStateQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.connectionClientState(request);
-    }, options);
-  };
-
-  const useConnectionConsensusState = <TData = QueryConnectionConsensusStateResponse,>({
-    request,
-    options
-  }: UseConnectionConsensusStateQuery<TData>) => {
-    return useQuery<QueryConnectionConsensusStateResponse, Error, TData>(["connectionConsensusStateQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.connectionConsensusState(request);
-    }, options);
-  };
-
-  return {
-    /** Connection queries an IBC connection end. */
-    useConnection,
-
-    /** Connections queries all the IBC connections of a chain. */
-    useConnections,
-
-    /**
-     * ClientConnections queries the connection paths associated with a client
-     * state.
-     */
-    useClientConnections,
-
-    /**
-     * ConnectionClientState queries the client state associated with the
-     * connection.
-     */
-    useConnectionClientState,
-
-    /**
-     * ConnectionConsensusState queries the consensus state associated with the
-     * connection.
-     */
-    useConnectionConsensusState
-  };
-};
+}

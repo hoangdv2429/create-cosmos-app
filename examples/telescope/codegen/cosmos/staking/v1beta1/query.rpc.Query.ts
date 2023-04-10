@@ -1,65 +1,67 @@
-import { Rpc } from "../../../helpers";
+import { PageRequest, PageRequestSDKType, PageResponse, PageResponseSDKType } from "../../base/query/v1beta1/pagination";
+import { Validator, ValidatorSDKType, DelegationResponse, DelegationResponseSDKType, UnbondingDelegation, UnbondingDelegationSDKType, RedelegationResponse, RedelegationResponseSDKType, HistoricalInfo, HistoricalInfoSDKType, Pool, PoolSDKType, Params, ParamsSDKType } from "./staking";
 import * as _m0 from "protobufjs/minimal";
-import { QueryClient, createProtobufRpcClient, ProtobufRpcClient } from "@cosmjs/stargate";
-import { ReactQueryParams } from "../../../react-query";
-import { useQuery } from "@tanstack/react-query";
-import { QueryValidatorsRequest, QueryValidatorsResponse, QueryValidatorRequest, QueryValidatorResponse, QueryValidatorDelegationsRequest, QueryValidatorDelegationsResponse, QueryValidatorUnbondingDelegationsRequest, QueryValidatorUnbondingDelegationsResponse, QueryDelegationRequest, QueryDelegationResponse, QueryUnbondingDelegationRequest, QueryUnbondingDelegationResponse, QueryDelegatorDelegationsRequest, QueryDelegatorDelegationsResponse, QueryDelegatorUnbondingDelegationsRequest, QueryDelegatorUnbondingDelegationsResponse, QueryRedelegationsRequest, QueryRedelegationsResponse, QueryDelegatorValidatorsRequest, QueryDelegatorValidatorsResponse, QueryDelegatorValidatorRequest, QueryDelegatorValidatorResponse, QueryHistoricalInfoRequest, QueryHistoricalInfoResponse, QueryPoolRequest, QueryPoolResponse, QueryParamsRequest, QueryParamsResponse } from "./query";
-/** Query defines the gRPC querier service. */
+import { grpc } from "@improbable-eng/grpc-web";
+import { UnaryMethodDefinitionish } from "../../../grpc-web";
+import { DeepPartial } from "../../../helpers";
+import { BrowserHeaders } from "browser-headers";
+import { QueryValidatorsRequest, QueryValidatorsRequestSDKType, QueryValidatorsResponse, QueryValidatorsResponseSDKType, QueryValidatorRequest, QueryValidatorRequestSDKType, QueryValidatorResponse, QueryValidatorResponseSDKType, QueryValidatorDelegationsRequest, QueryValidatorDelegationsRequestSDKType, QueryValidatorDelegationsResponse, QueryValidatorDelegationsResponseSDKType, QueryValidatorUnbondingDelegationsRequest, QueryValidatorUnbondingDelegationsRequestSDKType, QueryValidatorUnbondingDelegationsResponse, QueryValidatorUnbondingDelegationsResponseSDKType, QueryDelegationRequest, QueryDelegationRequestSDKType, QueryDelegationResponse, QueryDelegationResponseSDKType, QueryUnbondingDelegationRequest, QueryUnbondingDelegationRequestSDKType, QueryUnbondingDelegationResponse, QueryUnbondingDelegationResponseSDKType, QueryDelegatorDelegationsRequest, QueryDelegatorDelegationsRequestSDKType, QueryDelegatorDelegationsResponse, QueryDelegatorDelegationsResponseSDKType, QueryDelegatorUnbondingDelegationsRequest, QueryDelegatorUnbondingDelegationsRequestSDKType, QueryDelegatorUnbondingDelegationsResponse, QueryDelegatorUnbondingDelegationsResponseSDKType, QueryRedelegationsRequest, QueryRedelegationsRequestSDKType, QueryRedelegationsResponse, QueryRedelegationsResponseSDKType, QueryDelegatorValidatorsRequest, QueryDelegatorValidatorsRequestSDKType, QueryDelegatorValidatorsResponse, QueryDelegatorValidatorsResponseSDKType, QueryDelegatorValidatorRequest, QueryDelegatorValidatorRequestSDKType, QueryDelegatorValidatorResponse, QueryDelegatorValidatorResponseSDKType, QueryHistoricalInfoRequest, QueryHistoricalInfoRequestSDKType, QueryHistoricalInfoResponse, QueryHistoricalInfoResponseSDKType, QueryPoolRequest, QueryPoolRequestSDKType, QueryPoolResponse, QueryPoolResponseSDKType, QueryParamsRequest, QueryParamsRequestSDKType, QueryParamsResponse, QueryParamsResponseSDKType } from "./query";
 
+/** Query defines the gRPC querier service. */
 export interface Query {
   /** Validators queries all validators that match the given status. */
-  validators(request: QueryValidatorsRequest): Promise<QueryValidatorsResponse>;
+  validators(request: DeepPartial<QueryValidatorsRequest>, metadata?: grpc.Metadata): Promise<QueryValidatorsResponse>;
+
   /** Validator queries validator info for given validator address. */
+  validator(request: DeepPartial<QueryValidatorRequest>, metadata?: grpc.Metadata): Promise<QueryValidatorResponse>;
 
-  validator(request: QueryValidatorRequest): Promise<QueryValidatorResponse>;
   /** ValidatorDelegations queries delegate info for given validator. */
+  validatorDelegations(request: DeepPartial<QueryValidatorDelegationsRequest>, metadata?: grpc.Metadata): Promise<QueryValidatorDelegationsResponse>;
 
-  validatorDelegations(request: QueryValidatorDelegationsRequest): Promise<QueryValidatorDelegationsResponse>;
   /** ValidatorUnbondingDelegations queries unbonding delegations of a validator. */
+  validatorUnbondingDelegations(request: DeepPartial<QueryValidatorUnbondingDelegationsRequest>, metadata?: grpc.Metadata): Promise<QueryValidatorUnbondingDelegationsResponse>;
 
-  validatorUnbondingDelegations(request: QueryValidatorUnbondingDelegationsRequest): Promise<QueryValidatorUnbondingDelegationsResponse>;
   /** Delegation queries delegate info for given validator delegator pair. */
+  delegation(request: DeepPartial<QueryDelegationRequest>, metadata?: grpc.Metadata): Promise<QueryDelegationResponse>;
 
-  delegation(request: QueryDelegationRequest): Promise<QueryDelegationResponse>;
   /**
    * UnbondingDelegation queries unbonding info for given validator delegator
    * pair.
    */
+  unbondingDelegation(request: DeepPartial<QueryUnbondingDelegationRequest>, metadata?: grpc.Metadata): Promise<QueryUnbondingDelegationResponse>;
 
-  unbondingDelegation(request: QueryUnbondingDelegationRequest): Promise<QueryUnbondingDelegationResponse>;
   /** DelegatorDelegations queries all delegations of a given delegator address. */
+  delegatorDelegations(request: DeepPartial<QueryDelegatorDelegationsRequest>, metadata?: grpc.Metadata): Promise<QueryDelegatorDelegationsResponse>;
 
-  delegatorDelegations(request: QueryDelegatorDelegationsRequest): Promise<QueryDelegatorDelegationsResponse>;
   /**
    * DelegatorUnbondingDelegations queries all unbonding delegations of a given
    * delegator address.
    */
+  delegatorUnbondingDelegations(request: DeepPartial<QueryDelegatorUnbondingDelegationsRequest>, metadata?: grpc.Metadata): Promise<QueryDelegatorUnbondingDelegationsResponse>;
 
-  delegatorUnbondingDelegations(request: QueryDelegatorUnbondingDelegationsRequest): Promise<QueryDelegatorUnbondingDelegationsResponse>;
   /** Redelegations queries redelegations of given address. */
+  redelegations(request: DeepPartial<QueryRedelegationsRequest>, metadata?: grpc.Metadata): Promise<QueryRedelegationsResponse>;
 
-  redelegations(request: QueryRedelegationsRequest): Promise<QueryRedelegationsResponse>;
   /**
    * DelegatorValidators queries all validators info for given delegator
    * address.
    */
+  delegatorValidators(request: DeepPartial<QueryDelegatorValidatorsRequest>, metadata?: grpc.Metadata): Promise<QueryDelegatorValidatorsResponse>;
 
-  delegatorValidators(request: QueryDelegatorValidatorsRequest): Promise<QueryDelegatorValidatorsResponse>;
   /**
    * DelegatorValidator queries validator info for given delegator validator
    * pair.
    */
+  delegatorValidator(request: DeepPartial<QueryDelegatorValidatorRequest>, metadata?: grpc.Metadata): Promise<QueryDelegatorValidatorResponse>;
 
-  delegatorValidator(request: QueryDelegatorValidatorRequest): Promise<QueryDelegatorValidatorResponse>;
   /** HistoricalInfo queries the historical info for given height. */
+  historicalInfo(request: DeepPartial<QueryHistoricalInfoRequest>, metadata?: grpc.Metadata): Promise<QueryHistoricalInfoResponse>;
 
-  historicalInfo(request: QueryHistoricalInfoRequest): Promise<QueryHistoricalInfoResponse>;
   /** Pool queries the pool info. */
+  pool(request?: DeepPartial<QueryPoolRequest>, metadata?: grpc.Metadata): Promise<QueryPoolResponse>;
 
-  pool(request?: QueryPoolRequest): Promise<QueryPoolResponse>;
   /** Parameters queries the staking parameters. */
-
-  params(request?: QueryParamsRequest): Promise<QueryParamsResponse>;
+  params(request?: DeepPartial<QueryParamsRequest>, metadata?: grpc.Metadata): Promise<QueryParamsResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
@@ -82,408 +84,448 @@ export class QueryClientImpl implements Query {
     this.params = this.params.bind(this);
   }
 
-  validators(request: QueryValidatorsRequest): Promise<QueryValidatorsResponse> {
-    const data = QueryValidatorsRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "Validators", data);
-    return promise.then(data => QueryValidatorsResponse.decode(new _m0.Reader(data)));
+  validators(request: DeepPartial<QueryValidatorsRequest>, metadata?: grpc.Metadata): Promise<QueryValidatorsResponse> {
+    return this.rpc.unary(QueryValidatorsDesc, QueryValidatorsRequest.fromPartial(request), metadata);
   }
 
-  validator(request: QueryValidatorRequest): Promise<QueryValidatorResponse> {
-    const data = QueryValidatorRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "Validator", data);
-    return promise.then(data => QueryValidatorResponse.decode(new _m0.Reader(data)));
+  validator(request: DeepPartial<QueryValidatorRequest>, metadata?: grpc.Metadata): Promise<QueryValidatorResponse> {
+    return this.rpc.unary(QueryValidatorDesc, QueryValidatorRequest.fromPartial(request), metadata);
   }
 
-  validatorDelegations(request: QueryValidatorDelegationsRequest): Promise<QueryValidatorDelegationsResponse> {
-    const data = QueryValidatorDelegationsRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "ValidatorDelegations", data);
-    return promise.then(data => QueryValidatorDelegationsResponse.decode(new _m0.Reader(data)));
+  validatorDelegations(request: DeepPartial<QueryValidatorDelegationsRequest>, metadata?: grpc.Metadata): Promise<QueryValidatorDelegationsResponse> {
+    return this.rpc.unary(QueryValidatorDelegationsDesc, QueryValidatorDelegationsRequest.fromPartial(request), metadata);
   }
 
-  validatorUnbondingDelegations(request: QueryValidatorUnbondingDelegationsRequest): Promise<QueryValidatorUnbondingDelegationsResponse> {
-    const data = QueryValidatorUnbondingDelegationsRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "ValidatorUnbondingDelegations", data);
-    return promise.then(data => QueryValidatorUnbondingDelegationsResponse.decode(new _m0.Reader(data)));
+  validatorUnbondingDelegations(request: DeepPartial<QueryValidatorUnbondingDelegationsRequest>, metadata?: grpc.Metadata): Promise<QueryValidatorUnbondingDelegationsResponse> {
+    return this.rpc.unary(QueryValidatorUnbondingDelegationsDesc, QueryValidatorUnbondingDelegationsRequest.fromPartial(request), metadata);
   }
 
-  delegation(request: QueryDelegationRequest): Promise<QueryDelegationResponse> {
-    const data = QueryDelegationRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "Delegation", data);
-    return promise.then(data => QueryDelegationResponse.decode(new _m0.Reader(data)));
+  delegation(request: DeepPartial<QueryDelegationRequest>, metadata?: grpc.Metadata): Promise<QueryDelegationResponse> {
+    return this.rpc.unary(QueryDelegationDesc, QueryDelegationRequest.fromPartial(request), metadata);
   }
 
-  unbondingDelegation(request: QueryUnbondingDelegationRequest): Promise<QueryUnbondingDelegationResponse> {
-    const data = QueryUnbondingDelegationRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "UnbondingDelegation", data);
-    return promise.then(data => QueryUnbondingDelegationResponse.decode(new _m0.Reader(data)));
+  unbondingDelegation(request: DeepPartial<QueryUnbondingDelegationRequest>, metadata?: grpc.Metadata): Promise<QueryUnbondingDelegationResponse> {
+    return this.rpc.unary(QueryUnbondingDelegationDesc, QueryUnbondingDelegationRequest.fromPartial(request), metadata);
   }
 
-  delegatorDelegations(request: QueryDelegatorDelegationsRequest): Promise<QueryDelegatorDelegationsResponse> {
-    const data = QueryDelegatorDelegationsRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "DelegatorDelegations", data);
-    return promise.then(data => QueryDelegatorDelegationsResponse.decode(new _m0.Reader(data)));
+  delegatorDelegations(request: DeepPartial<QueryDelegatorDelegationsRequest>, metadata?: grpc.Metadata): Promise<QueryDelegatorDelegationsResponse> {
+    return this.rpc.unary(QueryDelegatorDelegationsDesc, QueryDelegatorDelegationsRequest.fromPartial(request), metadata);
   }
 
-  delegatorUnbondingDelegations(request: QueryDelegatorUnbondingDelegationsRequest): Promise<QueryDelegatorUnbondingDelegationsResponse> {
-    const data = QueryDelegatorUnbondingDelegationsRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "DelegatorUnbondingDelegations", data);
-    return promise.then(data => QueryDelegatorUnbondingDelegationsResponse.decode(new _m0.Reader(data)));
+  delegatorUnbondingDelegations(request: DeepPartial<QueryDelegatorUnbondingDelegationsRequest>, metadata?: grpc.Metadata): Promise<QueryDelegatorUnbondingDelegationsResponse> {
+    return this.rpc.unary(QueryDelegatorUnbondingDelegationsDesc, QueryDelegatorUnbondingDelegationsRequest.fromPartial(request), metadata);
   }
 
-  redelegations(request: QueryRedelegationsRequest): Promise<QueryRedelegationsResponse> {
-    const data = QueryRedelegationsRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "Redelegations", data);
-    return promise.then(data => QueryRedelegationsResponse.decode(new _m0.Reader(data)));
+  redelegations(request: DeepPartial<QueryRedelegationsRequest>, metadata?: grpc.Metadata): Promise<QueryRedelegationsResponse> {
+    return this.rpc.unary(QueryRedelegationsDesc, QueryRedelegationsRequest.fromPartial(request), metadata);
   }
 
-  delegatorValidators(request: QueryDelegatorValidatorsRequest): Promise<QueryDelegatorValidatorsResponse> {
-    const data = QueryDelegatorValidatorsRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "DelegatorValidators", data);
-    return promise.then(data => QueryDelegatorValidatorsResponse.decode(new _m0.Reader(data)));
+  delegatorValidators(request: DeepPartial<QueryDelegatorValidatorsRequest>, metadata?: grpc.Metadata): Promise<QueryDelegatorValidatorsResponse> {
+    return this.rpc.unary(QueryDelegatorValidatorsDesc, QueryDelegatorValidatorsRequest.fromPartial(request), metadata);
   }
 
-  delegatorValidator(request: QueryDelegatorValidatorRequest): Promise<QueryDelegatorValidatorResponse> {
-    const data = QueryDelegatorValidatorRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "DelegatorValidator", data);
-    return promise.then(data => QueryDelegatorValidatorResponse.decode(new _m0.Reader(data)));
+  delegatorValidator(request: DeepPartial<QueryDelegatorValidatorRequest>, metadata?: grpc.Metadata): Promise<QueryDelegatorValidatorResponse> {
+    return this.rpc.unary(QueryDelegatorValidatorDesc, QueryDelegatorValidatorRequest.fromPartial(request), metadata);
   }
 
-  historicalInfo(request: QueryHistoricalInfoRequest): Promise<QueryHistoricalInfoResponse> {
-    const data = QueryHistoricalInfoRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "HistoricalInfo", data);
-    return promise.then(data => QueryHistoricalInfoResponse.decode(new _m0.Reader(data)));
+  historicalInfo(request: DeepPartial<QueryHistoricalInfoRequest>, metadata?: grpc.Metadata): Promise<QueryHistoricalInfoResponse> {
+    return this.rpc.unary(QueryHistoricalInfoDesc, QueryHistoricalInfoRequest.fromPartial(request), metadata);
   }
 
-  pool(request: QueryPoolRequest = {}): Promise<QueryPoolResponse> {
-    const data = QueryPoolRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "Pool", data);
-    return promise.then(data => QueryPoolResponse.decode(new _m0.Reader(data)));
+  pool(request: DeepPartial<QueryPoolRequest> = {}, metadata?: grpc.Metadata): Promise<QueryPoolResponse> {
+    return this.rpc.unary(QueryPoolDesc, QueryPoolRequest.fromPartial(request), metadata);
   }
 
-  params(request: QueryParamsRequest = {}): Promise<QueryParamsResponse> {
-    const data = QueryParamsRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "Params", data);
-    return promise.then(data => QueryParamsResponse.decode(new _m0.Reader(data)));
+  params(request: DeepPartial<QueryParamsRequest> = {}, metadata?: grpc.Metadata): Promise<QueryParamsResponse> {
+    return this.rpc.unary(QueryParamsDesc, QueryParamsRequest.fromPartial(request), metadata);
   }
 
 }
-export const createRpcQueryExtension = (base: QueryClient) => {
-  const rpc = createProtobufRpcClient(base);
-  const queryService = new QueryClientImpl(rpc);
-  return {
-    validators(request: QueryValidatorsRequest): Promise<QueryValidatorsResponse> {
-      return queryService.validators(request);
-    },
-
-    validator(request: QueryValidatorRequest): Promise<QueryValidatorResponse> {
-      return queryService.validator(request);
-    },
-
-    validatorDelegations(request: QueryValidatorDelegationsRequest): Promise<QueryValidatorDelegationsResponse> {
-      return queryService.validatorDelegations(request);
-    },
-
-    validatorUnbondingDelegations(request: QueryValidatorUnbondingDelegationsRequest): Promise<QueryValidatorUnbondingDelegationsResponse> {
-      return queryService.validatorUnbondingDelegations(request);
-    },
-
-    delegation(request: QueryDelegationRequest): Promise<QueryDelegationResponse> {
-      return queryService.delegation(request);
-    },
-
-    unbondingDelegation(request: QueryUnbondingDelegationRequest): Promise<QueryUnbondingDelegationResponse> {
-      return queryService.unbondingDelegation(request);
-    },
-
-    delegatorDelegations(request: QueryDelegatorDelegationsRequest): Promise<QueryDelegatorDelegationsResponse> {
-      return queryService.delegatorDelegations(request);
-    },
-
-    delegatorUnbondingDelegations(request: QueryDelegatorUnbondingDelegationsRequest): Promise<QueryDelegatorUnbondingDelegationsResponse> {
-      return queryService.delegatorUnbondingDelegations(request);
-    },
-
-    redelegations(request: QueryRedelegationsRequest): Promise<QueryRedelegationsResponse> {
-      return queryService.redelegations(request);
-    },
-
-    delegatorValidators(request: QueryDelegatorValidatorsRequest): Promise<QueryDelegatorValidatorsResponse> {
-      return queryService.delegatorValidators(request);
-    },
-
-    delegatorValidator(request: QueryDelegatorValidatorRequest): Promise<QueryDelegatorValidatorResponse> {
-      return queryService.delegatorValidator(request);
-    },
-
-    historicalInfo(request: QueryHistoricalInfoRequest): Promise<QueryHistoricalInfoResponse> {
-      return queryService.historicalInfo(request);
-    },
-
-    pool(request?: QueryPoolRequest): Promise<QueryPoolResponse> {
-      return queryService.pool(request);
-    },
-
-    params(request?: QueryParamsRequest): Promise<QueryParamsResponse> {
-      return queryService.params(request);
+export const QueryDesc = {
+  serviceName: "cosmos.staking.v1beta1.Query"
+};
+export const QueryValidatorsDesc: UnaryMethodDefinitionish = {
+  methodName: "Validators",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryValidatorsRequest.encode(this).finish();
     }
 
-  };
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryValidatorsResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
 };
-export interface UseValidatorsQuery<TData> extends ReactQueryParams<QueryValidatorsResponse, TData> {
-  request: QueryValidatorsRequest;
-}
-export interface UseValidatorQuery<TData> extends ReactQueryParams<QueryValidatorResponse, TData> {
-  request: QueryValidatorRequest;
-}
-export interface UseValidatorDelegationsQuery<TData> extends ReactQueryParams<QueryValidatorDelegationsResponse, TData> {
-  request: QueryValidatorDelegationsRequest;
-}
-export interface UseValidatorUnbondingDelegationsQuery<TData> extends ReactQueryParams<QueryValidatorUnbondingDelegationsResponse, TData> {
-  request: QueryValidatorUnbondingDelegationsRequest;
-}
-export interface UseDelegationQuery<TData> extends ReactQueryParams<QueryDelegationResponse, TData> {
-  request: QueryDelegationRequest;
-}
-export interface UseUnbondingDelegationQuery<TData> extends ReactQueryParams<QueryUnbondingDelegationResponse, TData> {
-  request: QueryUnbondingDelegationRequest;
-}
-export interface UseDelegatorDelegationsQuery<TData> extends ReactQueryParams<QueryDelegatorDelegationsResponse, TData> {
-  request: QueryDelegatorDelegationsRequest;
-}
-export interface UseDelegatorUnbondingDelegationsQuery<TData> extends ReactQueryParams<QueryDelegatorUnbondingDelegationsResponse, TData> {
-  request: QueryDelegatorUnbondingDelegationsRequest;
-}
-export interface UseRedelegationsQuery<TData> extends ReactQueryParams<QueryRedelegationsResponse, TData> {
-  request: QueryRedelegationsRequest;
-}
-export interface UseDelegatorValidatorsQuery<TData> extends ReactQueryParams<QueryDelegatorValidatorsResponse, TData> {
-  request: QueryDelegatorValidatorsRequest;
-}
-export interface UseDelegatorValidatorQuery<TData> extends ReactQueryParams<QueryDelegatorValidatorResponse, TData> {
-  request: QueryDelegatorValidatorRequest;
-}
-export interface UseHistoricalInfoQuery<TData> extends ReactQueryParams<QueryHistoricalInfoResponse, TData> {
-  request: QueryHistoricalInfoRequest;
-}
-export interface UsePoolQuery<TData> extends ReactQueryParams<QueryPoolResponse, TData> {
-  request?: QueryPoolRequest;
-}
-export interface UseParamsQuery<TData> extends ReactQueryParams<QueryParamsResponse, TData> {
-  request?: QueryParamsRequest;
-}
+export const QueryValidatorDesc: UnaryMethodDefinitionish = {
+  methodName: "Validator",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryValidatorRequest.encode(this).finish();
+    }
 
-const _queryClients: WeakMap<ProtobufRpcClient, QueryClientImpl> = new WeakMap();
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryValidatorResponse.decode(data),
 
-const getQueryService = (rpc: ProtobufRpcClient | undefined): QueryClientImpl | undefined => {
-  if (!rpc) return;
+        toObject() {
+          return this;
+        }
 
-  if (_queryClients.has(rpc)) {
-    return _queryClients.get(rpc);
+      };
+    }
+
+  } as any)
+};
+export const QueryValidatorDelegationsDesc: UnaryMethodDefinitionish = {
+  methodName: "ValidatorDelegations",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryValidatorDelegationsRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryValidatorDelegationsResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryValidatorUnbondingDelegationsDesc: UnaryMethodDefinitionish = {
+  methodName: "ValidatorUnbondingDelegations",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryValidatorUnbondingDelegationsRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryValidatorUnbondingDelegationsResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryDelegationDesc: UnaryMethodDefinitionish = {
+  methodName: "Delegation",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryDelegationRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryDelegationResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryUnbondingDelegationDesc: UnaryMethodDefinitionish = {
+  methodName: "UnbondingDelegation",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryUnbondingDelegationRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryUnbondingDelegationResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryDelegatorDelegationsDesc: UnaryMethodDefinitionish = {
+  methodName: "DelegatorDelegations",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryDelegatorDelegationsRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryDelegatorDelegationsResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryDelegatorUnbondingDelegationsDesc: UnaryMethodDefinitionish = {
+  methodName: "DelegatorUnbondingDelegations",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryDelegatorUnbondingDelegationsRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryDelegatorUnbondingDelegationsResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryRedelegationsDesc: UnaryMethodDefinitionish = {
+  methodName: "Redelegations",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryRedelegationsRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryRedelegationsResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryDelegatorValidatorsDesc: UnaryMethodDefinitionish = {
+  methodName: "DelegatorValidators",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryDelegatorValidatorsRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryDelegatorValidatorsResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryDelegatorValidatorDesc: UnaryMethodDefinitionish = {
+  methodName: "DelegatorValidator",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryDelegatorValidatorRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryDelegatorValidatorResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryHistoricalInfoDesc: UnaryMethodDefinitionish = {
+  methodName: "HistoricalInfo",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryHistoricalInfoRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryHistoricalInfoResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryPoolDesc: UnaryMethodDefinitionish = {
+  methodName: "Pool",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryPoolRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryPoolResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export const QueryParamsDesc: UnaryMethodDefinitionish = {
+  methodName: "Params",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryParamsRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryParamsResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export interface Rpc {
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, request: any, metadata: grpc.Metadata | undefined): Promise<any>;
+}
+export class GrpcWebImpl {
+  host: string;
+  options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  };
+
+  constructor(host: string, options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  }) {
+    this.host = host;
+    this.options = options;
   }
 
-  const queryService = new QueryClientImpl(rpc);
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, _request: any, metadata: grpc.Metadata | undefined) {
+    const request = { ..._request,
+      ...methodDesc.requestType
+    };
+    const maybeCombinedMetadata = metadata && this.options.metadata ? new BrowserHeaders({ ...this.options?.metadata.headersMap,
+      ...metadata?.headersMap
+    }) : metadata || this.options.metadata;
+    return new Promise((resolve, reject) => {
+      grpc.unary(methodDesc, {
+        request,
+        host: this.host,
+        metadata: maybeCombinedMetadata,
+        transport: this.options.transport,
+        debug: this.options.debug,
+        onEnd: function (response) {
+          if (response.status === grpc.Code.OK) {
+            resolve(response.message);
+          } else {
+            const err = (new Error(response.statusMessage) as any);
+            err.code = response.status;
+            err.metadata = response.trailers;
+            reject(err);
+          }
+        }
+      });
+    });
+  }
 
-  _queryClients.set(rpc, queryService);
-
-  return queryService;
-};
-
-export const createRpcQueryHooks = (rpc: ProtobufRpcClient | undefined) => {
-  const queryService = getQueryService(rpc);
-
-  const useValidators = <TData = QueryValidatorsResponse,>({
-    request,
-    options
-  }: UseValidatorsQuery<TData>) => {
-    return useQuery<QueryValidatorsResponse, Error, TData>(["validatorsQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.validators(request);
-    }, options);
-  };
-
-  const useValidator = <TData = QueryValidatorResponse,>({
-    request,
-    options
-  }: UseValidatorQuery<TData>) => {
-    return useQuery<QueryValidatorResponse, Error, TData>(["validatorQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.validator(request);
-    }, options);
-  };
-
-  const useValidatorDelegations = <TData = QueryValidatorDelegationsResponse,>({
-    request,
-    options
-  }: UseValidatorDelegationsQuery<TData>) => {
-    return useQuery<QueryValidatorDelegationsResponse, Error, TData>(["validatorDelegationsQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.validatorDelegations(request);
-    }, options);
-  };
-
-  const useValidatorUnbondingDelegations = <TData = QueryValidatorUnbondingDelegationsResponse,>({
-    request,
-    options
-  }: UseValidatorUnbondingDelegationsQuery<TData>) => {
-    return useQuery<QueryValidatorUnbondingDelegationsResponse, Error, TData>(["validatorUnbondingDelegationsQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.validatorUnbondingDelegations(request);
-    }, options);
-  };
-
-  const useDelegation = <TData = QueryDelegationResponse,>({
-    request,
-    options
-  }: UseDelegationQuery<TData>) => {
-    return useQuery<QueryDelegationResponse, Error, TData>(["delegationQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.delegation(request);
-    }, options);
-  };
-
-  const useUnbondingDelegation = <TData = QueryUnbondingDelegationResponse,>({
-    request,
-    options
-  }: UseUnbondingDelegationQuery<TData>) => {
-    return useQuery<QueryUnbondingDelegationResponse, Error, TData>(["unbondingDelegationQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.unbondingDelegation(request);
-    }, options);
-  };
-
-  const useDelegatorDelegations = <TData = QueryDelegatorDelegationsResponse,>({
-    request,
-    options
-  }: UseDelegatorDelegationsQuery<TData>) => {
-    return useQuery<QueryDelegatorDelegationsResponse, Error, TData>(["delegatorDelegationsQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.delegatorDelegations(request);
-    }, options);
-  };
-
-  const useDelegatorUnbondingDelegations = <TData = QueryDelegatorUnbondingDelegationsResponse,>({
-    request,
-    options
-  }: UseDelegatorUnbondingDelegationsQuery<TData>) => {
-    return useQuery<QueryDelegatorUnbondingDelegationsResponse, Error, TData>(["delegatorUnbondingDelegationsQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.delegatorUnbondingDelegations(request);
-    }, options);
-  };
-
-  const useRedelegations = <TData = QueryRedelegationsResponse,>({
-    request,
-    options
-  }: UseRedelegationsQuery<TData>) => {
-    return useQuery<QueryRedelegationsResponse, Error, TData>(["redelegationsQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.redelegations(request);
-    }, options);
-  };
-
-  const useDelegatorValidators = <TData = QueryDelegatorValidatorsResponse,>({
-    request,
-    options
-  }: UseDelegatorValidatorsQuery<TData>) => {
-    return useQuery<QueryDelegatorValidatorsResponse, Error, TData>(["delegatorValidatorsQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.delegatorValidators(request);
-    }, options);
-  };
-
-  const useDelegatorValidator = <TData = QueryDelegatorValidatorResponse,>({
-    request,
-    options
-  }: UseDelegatorValidatorQuery<TData>) => {
-    return useQuery<QueryDelegatorValidatorResponse, Error, TData>(["delegatorValidatorQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.delegatorValidator(request);
-    }, options);
-  };
-
-  const useHistoricalInfo = <TData = QueryHistoricalInfoResponse,>({
-    request,
-    options
-  }: UseHistoricalInfoQuery<TData>) => {
-    return useQuery<QueryHistoricalInfoResponse, Error, TData>(["historicalInfoQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.historicalInfo(request);
-    }, options);
-  };
-
-  const usePool = <TData = QueryPoolResponse,>({
-    request,
-    options
-  }: UsePoolQuery<TData>) => {
-    return useQuery<QueryPoolResponse, Error, TData>(["poolQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.pool(request);
-    }, options);
-  };
-
-  const useParams = <TData = QueryParamsResponse,>({
-    request,
-    options
-  }: UseParamsQuery<TData>) => {
-    return useQuery<QueryParamsResponse, Error, TData>(["paramsQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.params(request);
-    }, options);
-  };
-
-  return {
-    /** Validators queries all validators that match the given status. */
-    useValidators,
-
-    /** Validator queries validator info for given validator address. */
-    useValidator,
-
-    /** ValidatorDelegations queries delegate info for given validator. */
-    useValidatorDelegations,
-
-    /** ValidatorUnbondingDelegations queries unbonding delegations of a validator. */
-    useValidatorUnbondingDelegations,
-
-    /** Delegation queries delegate info for given validator delegator pair. */
-    useDelegation,
-
-    /**
-     * UnbondingDelegation queries unbonding info for given validator delegator
-     * pair.
-     */
-    useUnbondingDelegation,
-
-    /** DelegatorDelegations queries all delegations of a given delegator address. */
-    useDelegatorDelegations,
-
-    /**
-     * DelegatorUnbondingDelegations queries all unbonding delegations of a given
-     * delegator address.
-     */
-    useDelegatorUnbondingDelegations,
-
-    /** Redelegations queries redelegations of given address. */
-    useRedelegations,
-
-    /**
-     * DelegatorValidators queries all validators info for given delegator
-     * address.
-     */
-    useDelegatorValidators,
-
-    /**
-     * DelegatorValidator queries validator info for given delegator validator
-     * pair.
-     */
-    useDelegatorValidator,
-
-    /** HistoricalInfo queries the historical info for given height. */
-    useHistoricalInfo,
-
-    /** Pool queries the pool info. */
-    usePool,
-
-    /** Parameters queries the staking parameters. */
-    useParams
-  };
-};
+}

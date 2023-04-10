@@ -1,17 +1,19 @@
-import { Rpc } from "../../../helpers";
+import { PageRequest, PageRequestSDKType, PageResponse, PageResponseSDKType } from "../../base/query/v1beta1/pagination";
+import { Any, AnyProtoMsg, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
 import * as _m0 from "protobufjs/minimal";
-import { QueryClient, createProtobufRpcClient, ProtobufRpcClient } from "@cosmjs/stargate";
-import { ReactQueryParams } from "../../../react-query";
-import { useQuery } from "@tanstack/react-query";
-import { QueryEvidenceRequest, QueryEvidenceResponse, QueryAllEvidenceRequest, QueryAllEvidenceResponse } from "./query";
-/** Query defines the gRPC querier service. */
+import { grpc } from "@improbable-eng/grpc-web";
+import { UnaryMethodDefinitionish } from "../../../grpc-web";
+import { DeepPartial } from "../../../helpers";
+import { BrowserHeaders } from "browser-headers";
+import { QueryEvidenceRequest, QueryEvidenceRequestSDKType, QueryEvidenceResponse, QueryEvidenceResponseSDKType, QueryAllEvidenceRequest, QueryAllEvidenceRequestSDKType, QueryAllEvidenceResponse, QueryAllEvidenceResponseSDKType } from "./query";
 
+/** Query defines the gRPC querier service. */
 export interface Query {
   /** Evidence queries evidence based on evidence hash. */
-  evidence(request: QueryEvidenceRequest): Promise<QueryEvidenceResponse>;
-  /** AllEvidence queries all evidence. */
+  evidence(request: DeepPartial<QueryEvidenceRequest>, metadata?: grpc.Metadata): Promise<QueryEvidenceResponse>;
 
-  allEvidence(request?: QueryAllEvidenceRequest): Promise<QueryAllEvidenceResponse>;
+  /** AllEvidence queries all evidence. */
+  allEvidence(request?: DeepPartial<QueryAllEvidenceRequest>, metadata?: grpc.Metadata): Promise<QueryAllEvidenceResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
@@ -22,86 +24,114 @@ export class QueryClientImpl implements Query {
     this.allEvidence = this.allEvidence.bind(this);
   }
 
-  evidence(request: QueryEvidenceRequest): Promise<QueryEvidenceResponse> {
-    const data = QueryEvidenceRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.evidence.v1beta1.Query", "Evidence", data);
-    return promise.then(data => QueryEvidenceResponse.decode(new _m0.Reader(data)));
+  evidence(request: DeepPartial<QueryEvidenceRequest>, metadata?: grpc.Metadata): Promise<QueryEvidenceResponse> {
+    return this.rpc.unary(QueryEvidenceDesc, QueryEvidenceRequest.fromPartial(request), metadata);
   }
 
-  allEvidence(request: QueryAllEvidenceRequest = {
+  allEvidence(request: DeepPartial<QueryAllEvidenceRequest> = {
     pagination: undefined
-  }): Promise<QueryAllEvidenceResponse> {
-    const data = QueryAllEvidenceRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.evidence.v1beta1.Query", "AllEvidence", data);
-    return promise.then(data => QueryAllEvidenceResponse.decode(new _m0.Reader(data)));
+  }, metadata?: grpc.Metadata): Promise<QueryAllEvidenceResponse> {
+    return this.rpc.unary(QueryAllEvidenceDesc, QueryAllEvidenceRequest.fromPartial(request), metadata);
   }
 
 }
-export const createRpcQueryExtension = (base: QueryClient) => {
-  const rpc = createProtobufRpcClient(base);
-  const queryService = new QueryClientImpl(rpc);
-  return {
-    evidence(request: QueryEvidenceRequest): Promise<QueryEvidenceResponse> {
-      return queryService.evidence(request);
-    },
-
-    allEvidence(request?: QueryAllEvidenceRequest): Promise<QueryAllEvidenceResponse> {
-      return queryService.allEvidence(request);
+export const QueryDesc = {
+  serviceName: "cosmos.evidence.v1beta1.Query"
+};
+export const QueryEvidenceDesc: UnaryMethodDefinitionish = {
+  methodName: "Evidence",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryEvidenceRequest.encode(this).finish();
     }
 
-  };
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryEvidenceResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
 };
-export interface UseEvidenceQuery<TData> extends ReactQueryParams<QueryEvidenceResponse, TData> {
-  request: QueryEvidenceRequest;
+export const QueryAllEvidenceDesc: UnaryMethodDefinitionish = {
+  methodName: "AllEvidence",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryAllEvidenceRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryAllEvidenceResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export interface Rpc {
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, request: any, metadata: grpc.Metadata | undefined): Promise<any>;
 }
-export interface UseAllEvidenceQuery<TData> extends ReactQueryParams<QueryAllEvidenceResponse, TData> {
-  request?: QueryAllEvidenceRequest;
-}
+export class GrpcWebImpl {
+  host: string;
+  options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  };
 
-const _queryClients: WeakMap<ProtobufRpcClient, QueryClientImpl> = new WeakMap();
-
-const getQueryService = (rpc: ProtobufRpcClient | undefined): QueryClientImpl | undefined => {
-  if (!rpc) return;
-
-  if (_queryClients.has(rpc)) {
-    return _queryClients.get(rpc);
+  constructor(host: string, options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  }) {
+    this.host = host;
+    this.options = options;
   }
 
-  const queryService = new QueryClientImpl(rpc);
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, _request: any, metadata: grpc.Metadata | undefined) {
+    const request = { ..._request,
+      ...methodDesc.requestType
+    };
+    const maybeCombinedMetadata = metadata && this.options.metadata ? new BrowserHeaders({ ...this.options?.metadata.headersMap,
+      ...metadata?.headersMap
+    }) : metadata || this.options.metadata;
+    return new Promise((resolve, reject) => {
+      grpc.unary(methodDesc, {
+        request,
+        host: this.host,
+        metadata: maybeCombinedMetadata,
+        transport: this.options.transport,
+        debug: this.options.debug,
+        onEnd: function (response) {
+          if (response.status === grpc.Code.OK) {
+            resolve(response.message);
+          } else {
+            const err = (new Error(response.statusMessage) as any);
+            err.code = response.status;
+            err.metadata = response.trailers;
+            reject(err);
+          }
+        }
+      });
+    });
+  }
 
-  _queryClients.set(rpc, queryService);
-
-  return queryService;
-};
-
-export const createRpcQueryHooks = (rpc: ProtobufRpcClient | undefined) => {
-  const queryService = getQueryService(rpc);
-
-  const useEvidence = <TData = QueryEvidenceResponse,>({
-    request,
-    options
-  }: UseEvidenceQuery<TData>) => {
-    return useQuery<QueryEvidenceResponse, Error, TData>(["evidenceQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.evidence(request);
-    }, options);
-  };
-
-  const useAllEvidence = <TData = QueryAllEvidenceResponse,>({
-    request,
-    options
-  }: UseAllEvidenceQuery<TData>) => {
-    return useQuery<QueryAllEvidenceResponse, Error, TData>(["allEvidenceQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.allEvidence(request);
-    }, options);
-  };
-
-  return {
-    /** Evidence queries evidence based on evidence hash. */
-    useEvidence,
-
-    /** AllEvidence queries all evidence. */
-    useAllEvidence
-  };
-};
+}

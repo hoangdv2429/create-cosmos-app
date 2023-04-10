@@ -1,6 +1,8 @@
 import * as _m0 from "protobufjs/minimal";
-/** ModuleDescriptor describes an app module. */
+import { isSet, DeepPartial } from "../../../helpers";
+export const protobufPackage = "cosmos.app.v1alpha1";
 
+/** ModuleDescriptor describes an app module. */
 export interface ModuleDescriptor {
   /**
    * go_import names the package that should be imported by an app to load the
@@ -10,14 +12,15 @@ export interface ModuleDescriptor {
    * precedence over go_package when both are defined.
    */
   goImport: string;
+
   /**
    * use_package refers to a protobuf package that this module
    * uses and exposes to the world. In an app, only one module should "use"
    * or own a single protobuf package. It is assumed that the module uses
    * all of the .proto files in a single package.
    */
-
   usePackage: PackageReference[];
+
   /**
    * can_migrate_from defines which module versions this module can migrate
    * state from. The framework will check that one module version is able to
@@ -27,12 +30,15 @@ export interface ModuleDescriptor {
    * declares it can migrate from v1, the framework knows how to migrate
    * from v1 to v3, assuming all 3 module versions are registered at runtime.
    */
-
   canMigrateFrom: MigrateFromInfo[];
 }
-/** ModuleDescriptor describes an app module. */
+export interface ModuleDescriptorProtoMsg {
+  typeUrl: "/cosmos.app.v1alpha1.ModuleDescriptor";
+  value: Uint8Array;
+}
 
-export interface ModuleDescriptorSDKType {
+/** ModuleDescriptor describes an app module. */
+export interface ModuleDescriptorAmino {
   /**
    * go_import names the package that should be imported by an app to load the
    * module in the runtime module registry. Either go_import must be defined here
@@ -41,14 +47,15 @@ export interface ModuleDescriptorSDKType {
    * precedence over go_package when both are defined.
    */
   go_import: string;
+
   /**
    * use_package refers to a protobuf package that this module
    * uses and exposes to the world. In an app, only one module should "use"
    * or own a single protobuf package. It is assumed that the module uses
    * all of the .proto files in a single package.
    */
+  use_package: PackageReferenceAmino[];
 
-  use_package: PackageReferenceSDKType[];
   /**
    * can_migrate_from defines which module versions this module can migrate
    * state from. The framework will check that one module version is able to
@@ -58,14 +65,25 @@ export interface ModuleDescriptorSDKType {
    * declares it can migrate from v1, the framework knows how to migrate
    * from v1 to v3, assuming all 3 module versions are registered at runtime.
    */
+  can_migrate_from: MigrateFromInfoAmino[];
+}
+export interface ModuleDescriptorAminoMsg {
+  type: "cosmos-sdk/ModuleDescriptor";
+  value: ModuleDescriptorAmino;
+}
 
+/** ModuleDescriptor describes an app module. */
+export interface ModuleDescriptorSDKType {
+  go_import: string;
+  use_package: PackageReferenceSDKType[];
   can_migrate_from: MigrateFromInfoSDKType[];
 }
-/** PackageReference is a reference to a protobuf package used by a module. */
 
+/** PackageReference is a reference to a protobuf package used by a module. */
 export interface PackageReference {
   /** name is the fully-qualified name of the package. */
   name: string;
+
   /**
    * revision is the optional revision of the package that is being used.
    * Protobuf packages used in Cosmos should generally have a major version
@@ -103,14 +121,18 @@ export interface PackageReference {
    *   are important good client UX
    * * protobuf files are changed in backwards and forwards compatible ways
    */
-
   revision: number;
 }
-/** PackageReference is a reference to a protobuf package used by a module. */
+export interface PackageReferenceProtoMsg {
+  typeUrl: "/cosmos.app.v1alpha1.PackageReference";
+  value: Uint8Array;
+}
 
-export interface PackageReferenceSDKType {
+/** PackageReference is a reference to a protobuf package used by a module. */
+export interface PackageReferenceAmino {
   /** name is the fully-qualified name of the package. */
   name: string;
+
   /**
    * revision is the optional revision of the package that is being used.
    * Protobuf packages used in Cosmos should generally have a major version
@@ -148,14 +170,23 @@ export interface PackageReferenceSDKType {
    *   are important good client UX
    * * protobuf files are changed in backwards and forwards compatible ways
    */
-
   revision: number;
 }
+export interface PackageReferenceAminoMsg {
+  type: "cosmos-sdk/PackageReference";
+  value: PackageReferenceAmino;
+}
+
+/** PackageReference is a reference to a protobuf package used by a module. */
+export interface PackageReferenceSDKType {
+  name: string;
+  revision: number;
+}
+
 /**
  * MigrateFromInfo is information on a module version that a newer module
  * can migrate from.
  */
-
 export interface MigrateFromInfo {
   /**
    * module is the fully-qualified protobuf name of the module config object
@@ -163,16 +194,32 @@ export interface MigrateFromInfo {
    */
   module: string;
 }
+export interface MigrateFromInfoProtoMsg {
+  typeUrl: "/cosmos.app.v1alpha1.MigrateFromInfo";
+  value: Uint8Array;
+}
+
 /**
  * MigrateFromInfo is information on a module version that a newer module
  * can migrate from.
  */
-
-export interface MigrateFromInfoSDKType {
+export interface MigrateFromInfoAmino {
   /**
    * module is the fully-qualified protobuf name of the module config object
    * for the previous module version, ex: "cosmos.group.module.v1.Module".
    */
+  module: string;
+}
+export interface MigrateFromInfoAminoMsg {
+  type: "cosmos-sdk/MigrateFromInfo";
+  value: MigrateFromInfoAmino;
+}
+
+/**
+ * MigrateFromInfo is information on a module version that a newer module
+ * can migrate from.
+ */
+export interface MigrateFromInfoSDKType {
   module: string;
 }
 
@@ -185,6 +232,9 @@ function createBaseModuleDescriptor(): ModuleDescriptor {
 }
 
 export const ModuleDescriptor = {
+  typeUrl: "/cosmos.app.v1alpha1.ModuleDescriptor",
+  aminoType: "cosmos-sdk/ModuleDescriptor",
+
   encode(message: ModuleDescriptor, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.goImport !== "") {
       writer.uint32(10).string(message.goImport);
@@ -231,12 +281,119 @@ export const ModuleDescriptor = {
     return message;
   },
 
-  fromPartial(object: Partial<ModuleDescriptor>): ModuleDescriptor {
+  fromJSON(object: any): ModuleDescriptor {
+    return {
+      goImport: isSet(object.goImport) ? String(object.goImport) : "",
+      usePackage: Array.isArray(object?.usePackage) ? object.usePackage.map((e: any) => PackageReference.fromJSON(e)) : [],
+      canMigrateFrom: Array.isArray(object?.canMigrateFrom) ? object.canMigrateFrom.map((e: any) => MigrateFromInfo.fromJSON(e)) : []
+    };
+  },
+
+  toJSON(message: ModuleDescriptor): unknown {
+    const obj: any = {};
+    message.goImport !== undefined && (obj.goImport = message.goImport);
+
+    if (message.usePackage) {
+      obj.usePackage = message.usePackage.map(e => e ? PackageReference.toJSON(e) : undefined);
+    } else {
+      obj.usePackage = [];
+    }
+
+    if (message.canMigrateFrom) {
+      obj.canMigrateFrom = message.canMigrateFrom.map(e => e ? MigrateFromInfo.toJSON(e) : undefined);
+    } else {
+      obj.canMigrateFrom = [];
+    }
+
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<ModuleDescriptor>): ModuleDescriptor {
     const message = createBaseModuleDescriptor();
     message.goImport = object.goImport ?? "";
     message.usePackage = object.usePackage?.map(e => PackageReference.fromPartial(e)) || [];
     message.canMigrateFrom = object.canMigrateFrom?.map(e => MigrateFromInfo.fromPartial(e)) || [];
     return message;
+  },
+
+  fromSDK(object: ModuleDescriptorSDKType): ModuleDescriptor {
+    return {
+      goImport: object?.go_import,
+      usePackage: Array.isArray(object?.use_package) ? object.use_package.map((e: any) => PackageReference.fromSDK(e)) : [],
+      canMigrateFrom: Array.isArray(object?.can_migrate_from) ? object.can_migrate_from.map((e: any) => MigrateFromInfo.fromSDK(e)) : []
+    };
+  },
+
+  toSDK(message: ModuleDescriptor): ModuleDescriptorSDKType {
+    const obj: any = {};
+    obj.go_import = message.goImport;
+
+    if (message.usePackage) {
+      obj.use_package = message.usePackage.map(e => e ? PackageReference.toSDK(e) : undefined);
+    } else {
+      obj.use_package = [];
+    }
+
+    if (message.canMigrateFrom) {
+      obj.can_migrate_from = message.canMigrateFrom.map(e => e ? MigrateFromInfo.toSDK(e) : undefined);
+    } else {
+      obj.can_migrate_from = [];
+    }
+
+    return obj;
+  },
+
+  fromAmino(object: ModuleDescriptorAmino): ModuleDescriptor {
+    return {
+      goImport: object.go_import,
+      usePackage: Array.isArray(object?.use_package) ? object.use_package.map((e: any) => PackageReference.fromAmino(e)) : [],
+      canMigrateFrom: Array.isArray(object?.can_migrate_from) ? object.can_migrate_from.map((e: any) => MigrateFromInfo.fromAmino(e)) : []
+    };
+  },
+
+  toAmino(message: ModuleDescriptor): ModuleDescriptorAmino {
+    const obj: any = {};
+    obj.go_import = message.goImport;
+
+    if (message.usePackage) {
+      obj.use_package = message.usePackage.map(e => e ? PackageReference.toAmino(e) : undefined);
+    } else {
+      obj.use_package = [];
+    }
+
+    if (message.canMigrateFrom) {
+      obj.can_migrate_from = message.canMigrateFrom.map(e => e ? MigrateFromInfo.toAmino(e) : undefined);
+    } else {
+      obj.can_migrate_from = [];
+    }
+
+    return obj;
+  },
+
+  fromAminoMsg(object: ModuleDescriptorAminoMsg): ModuleDescriptor {
+    return ModuleDescriptor.fromAmino(object.value);
+  },
+
+  toAminoMsg(message: ModuleDescriptor): ModuleDescriptorAminoMsg {
+    return {
+      type: "cosmos-sdk/ModuleDescriptor",
+      value: ModuleDescriptor.toAmino(message)
+    };
+  },
+
+  fromProtoMsg(message: ModuleDescriptorProtoMsg): ModuleDescriptor {
+    return ModuleDescriptor.decode(message.value);
+  },
+
+  toProto(message: ModuleDescriptor): Uint8Array {
+    return ModuleDescriptor.encode(message).finish();
+  },
+
+  toProtoMsg(message: ModuleDescriptor): ModuleDescriptorProtoMsg {
+    return {
+      typeUrl: "/cosmos.app.v1alpha1.ModuleDescriptor",
+      value: ModuleDescriptor.encode(message).finish()
+    };
   }
 
 };
@@ -249,6 +406,9 @@ function createBasePackageReference(): PackageReference {
 }
 
 export const PackageReference = {
+  typeUrl: "/cosmos.app.v1alpha1.PackageReference",
+  aminoType: "cosmos-sdk/PackageReference",
+
   encode(message: PackageReference, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -287,11 +447,79 @@ export const PackageReference = {
     return message;
   },
 
-  fromPartial(object: Partial<PackageReference>): PackageReference {
+  fromJSON(object: any): PackageReference {
+    return {
+      name: isSet(object.name) ? String(object.name) : "",
+      revision: isSet(object.revision) ? Number(object.revision) : 0
+    };
+  },
+
+  toJSON(message: PackageReference): unknown {
+    const obj: any = {};
+    message.name !== undefined && (obj.name = message.name);
+    message.revision !== undefined && (obj.revision = Math.round(message.revision));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<PackageReference>): PackageReference {
     const message = createBasePackageReference();
     message.name = object.name ?? "";
     message.revision = object.revision ?? 0;
     return message;
+  },
+
+  fromSDK(object: PackageReferenceSDKType): PackageReference {
+    return {
+      name: object?.name,
+      revision: object?.revision
+    };
+  },
+
+  toSDK(message: PackageReference): PackageReferenceSDKType {
+    const obj: any = {};
+    obj.name = message.name;
+    obj.revision = message.revision;
+    return obj;
+  },
+
+  fromAmino(object: PackageReferenceAmino): PackageReference {
+    return {
+      name: object.name,
+      revision: object.revision
+    };
+  },
+
+  toAmino(message: PackageReference): PackageReferenceAmino {
+    const obj: any = {};
+    obj.name = message.name;
+    obj.revision = message.revision;
+    return obj;
+  },
+
+  fromAminoMsg(object: PackageReferenceAminoMsg): PackageReference {
+    return PackageReference.fromAmino(object.value);
+  },
+
+  toAminoMsg(message: PackageReference): PackageReferenceAminoMsg {
+    return {
+      type: "cosmos-sdk/PackageReference",
+      value: PackageReference.toAmino(message)
+    };
+  },
+
+  fromProtoMsg(message: PackageReferenceProtoMsg): PackageReference {
+    return PackageReference.decode(message.value);
+  },
+
+  toProto(message: PackageReference): Uint8Array {
+    return PackageReference.encode(message).finish();
+  },
+
+  toProtoMsg(message: PackageReference): PackageReferenceProtoMsg {
+    return {
+      typeUrl: "/cosmos.app.v1alpha1.PackageReference",
+      value: PackageReference.encode(message).finish()
+    };
   }
 
 };
@@ -303,6 +531,9 @@ function createBaseMigrateFromInfo(): MigrateFromInfo {
 }
 
 export const MigrateFromInfo = {
+  typeUrl: "/cosmos.app.v1alpha1.MigrateFromInfo",
+  aminoType: "cosmos-sdk/MigrateFromInfo",
+
   encode(message: MigrateFromInfo, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -333,10 +564,72 @@ export const MigrateFromInfo = {
     return message;
   },
 
-  fromPartial(object: Partial<MigrateFromInfo>): MigrateFromInfo {
+  fromJSON(object: any): MigrateFromInfo {
+    return {
+      module: isSet(object.module) ? String(object.module) : ""
+    };
+  },
+
+  toJSON(message: MigrateFromInfo): unknown {
+    const obj: any = {};
+    message.module !== undefined && (obj.module = message.module);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MigrateFromInfo>): MigrateFromInfo {
     const message = createBaseMigrateFromInfo();
     message.module = object.module ?? "";
     return message;
+  },
+
+  fromSDK(object: MigrateFromInfoSDKType): MigrateFromInfo {
+    return {
+      module: object?.module
+    };
+  },
+
+  toSDK(message: MigrateFromInfo): MigrateFromInfoSDKType {
+    const obj: any = {};
+    obj.module = message.module;
+    return obj;
+  },
+
+  fromAmino(object: MigrateFromInfoAmino): MigrateFromInfo {
+    return {
+      module: object.module
+    };
+  },
+
+  toAmino(message: MigrateFromInfo): MigrateFromInfoAmino {
+    const obj: any = {};
+    obj.module = message.module;
+    return obj;
+  },
+
+  fromAminoMsg(object: MigrateFromInfoAminoMsg): MigrateFromInfo {
+    return MigrateFromInfo.fromAmino(object.value);
+  },
+
+  toAminoMsg(message: MigrateFromInfo): MigrateFromInfoAminoMsg {
+    return {
+      type: "cosmos-sdk/MigrateFromInfo",
+      value: MigrateFromInfo.toAmino(message)
+    };
+  },
+
+  fromProtoMsg(message: MigrateFromInfoProtoMsg): MigrateFromInfo {
+    return MigrateFromInfo.decode(message.value);
+  },
+
+  toProto(message: MigrateFromInfo): Uint8Array {
+    return MigrateFromInfo.encode(message).finish();
+  },
+
+  toProtoMsg(message: MigrateFromInfo): MigrateFromInfoProtoMsg {
+    return {
+      typeUrl: "/cosmos.app.v1alpha1.MigrateFromInfo",
+      value: MigrateFromInfo.encode(message).finish()
+    };
   }
 
 };

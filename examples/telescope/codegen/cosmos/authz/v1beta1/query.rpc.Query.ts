@@ -1,28 +1,30 @@
-import { Rpc } from "../../../helpers";
+import { PageRequest, PageRequestSDKType, PageResponse, PageResponseSDKType } from "../../base/query/v1beta1/pagination";
+import { Grant, GrantSDKType, GrantAuthorization, GrantAuthorizationSDKType } from "./authz";
 import * as _m0 from "protobufjs/minimal";
-import { QueryClient, createProtobufRpcClient, ProtobufRpcClient } from "@cosmjs/stargate";
-import { ReactQueryParams } from "../../../react-query";
-import { useQuery } from "@tanstack/react-query";
-import { QueryGrantsRequest, QueryGrantsResponse, QueryGranterGrantsRequest, QueryGranterGrantsResponse, QueryGranteeGrantsRequest, QueryGranteeGrantsResponse } from "./query";
-/** Query defines the gRPC querier service. */
+import { grpc } from "@improbable-eng/grpc-web";
+import { UnaryMethodDefinitionish } from "../../../grpc-web";
+import { DeepPartial } from "../../../helpers";
+import { BrowserHeaders } from "browser-headers";
+import { QueryGrantsRequest, QueryGrantsRequestSDKType, QueryGrantsResponse, QueryGrantsResponseSDKType, QueryGranterGrantsRequest, QueryGranterGrantsRequestSDKType, QueryGranterGrantsResponse, QueryGranterGrantsResponseSDKType, QueryGranteeGrantsRequest, QueryGranteeGrantsRequestSDKType, QueryGranteeGrantsResponse, QueryGranteeGrantsResponseSDKType } from "./query";
 
+/** Query defines the gRPC querier service. */
 export interface Query {
   /** Returns list of `Authorization`, granted to the grantee by the granter. */
-  grants(request: QueryGrantsRequest): Promise<QueryGrantsResponse>;
+  grants(request: DeepPartial<QueryGrantsRequest>, metadata?: grpc.Metadata): Promise<QueryGrantsResponse>;
+
   /**
    * GranterGrants returns list of `GrantAuthorization`, granted by granter.
    * 
    * Since: cosmos-sdk 0.46
    */
+  granterGrants(request: DeepPartial<QueryGranterGrantsRequest>, metadata?: grpc.Metadata): Promise<QueryGranterGrantsResponse>;
 
-  granterGrants(request: QueryGranterGrantsRequest): Promise<QueryGranterGrantsResponse>;
   /**
    * GranteeGrants returns a list of `GrantAuthorization` by grantee.
    * 
    * Since: cosmos-sdk 0.46
    */
-
-  granteeGrants(request: QueryGranteeGrantsRequest): Promise<QueryGranteeGrantsResponse>;
+  granteeGrants(request: DeepPartial<QueryGranteeGrantsRequest>, metadata?: grpc.Metadata): Promise<QueryGranteeGrantsResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
@@ -34,118 +36,140 @@ export class QueryClientImpl implements Query {
     this.granteeGrants = this.granteeGrants.bind(this);
   }
 
-  grants(request: QueryGrantsRequest): Promise<QueryGrantsResponse> {
-    const data = QueryGrantsRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.authz.v1beta1.Query", "Grants", data);
-    return promise.then(data => QueryGrantsResponse.decode(new _m0.Reader(data)));
+  grants(request: DeepPartial<QueryGrantsRequest>, metadata?: grpc.Metadata): Promise<QueryGrantsResponse> {
+    return this.rpc.unary(QueryGrantsDesc, QueryGrantsRequest.fromPartial(request), metadata);
   }
 
-  granterGrants(request: QueryGranterGrantsRequest): Promise<QueryGranterGrantsResponse> {
-    const data = QueryGranterGrantsRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.authz.v1beta1.Query", "GranterGrants", data);
-    return promise.then(data => QueryGranterGrantsResponse.decode(new _m0.Reader(data)));
+  granterGrants(request: DeepPartial<QueryGranterGrantsRequest>, metadata?: grpc.Metadata): Promise<QueryGranterGrantsResponse> {
+    return this.rpc.unary(QueryGranterGrantsDesc, QueryGranterGrantsRequest.fromPartial(request), metadata);
   }
 
-  granteeGrants(request: QueryGranteeGrantsRequest): Promise<QueryGranteeGrantsResponse> {
-    const data = QueryGranteeGrantsRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.authz.v1beta1.Query", "GranteeGrants", data);
-    return promise.then(data => QueryGranteeGrantsResponse.decode(new _m0.Reader(data)));
+  granteeGrants(request: DeepPartial<QueryGranteeGrantsRequest>, metadata?: grpc.Metadata): Promise<QueryGranteeGrantsResponse> {
+    return this.rpc.unary(QueryGranteeGrantsDesc, QueryGranteeGrantsRequest.fromPartial(request), metadata);
   }
 
 }
-export const createRpcQueryExtension = (base: QueryClient) => {
-  const rpc = createProtobufRpcClient(base);
-  const queryService = new QueryClientImpl(rpc);
-  return {
-    grants(request: QueryGrantsRequest): Promise<QueryGrantsResponse> {
-      return queryService.grants(request);
-    },
-
-    granterGrants(request: QueryGranterGrantsRequest): Promise<QueryGranterGrantsResponse> {
-      return queryService.granterGrants(request);
-    },
-
-    granteeGrants(request: QueryGranteeGrantsRequest): Promise<QueryGranteeGrantsResponse> {
-      return queryService.granteeGrants(request);
+export const QueryDesc = {
+  serviceName: "cosmos.authz.v1beta1.Query"
+};
+export const QueryGrantsDesc: UnaryMethodDefinitionish = {
+  methodName: "Grants",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryGrantsRequest.encode(this).finish();
     }
 
-  };
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryGrantsResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
 };
-export interface UseGrantsQuery<TData> extends ReactQueryParams<QueryGrantsResponse, TData> {
-  request: QueryGrantsRequest;
-}
-export interface UseGranterGrantsQuery<TData> extends ReactQueryParams<QueryGranterGrantsResponse, TData> {
-  request: QueryGranterGrantsRequest;
-}
-export interface UseGranteeGrantsQuery<TData> extends ReactQueryParams<QueryGranteeGrantsResponse, TData> {
-  request: QueryGranteeGrantsRequest;
-}
+export const QueryGranterGrantsDesc: UnaryMethodDefinitionish = {
+  methodName: "GranterGrants",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryGranterGrantsRequest.encode(this).finish();
+    }
 
-const _queryClients: WeakMap<ProtobufRpcClient, QueryClientImpl> = new WeakMap();
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryGranterGrantsResponse.decode(data),
 
-const getQueryService = (rpc: ProtobufRpcClient | undefined): QueryClientImpl | undefined => {
-  if (!rpc) return;
+        toObject() {
+          return this;
+        }
 
-  if (_queryClients.has(rpc)) {
-    return _queryClients.get(rpc);
+      };
+    }
+
+  } as any)
+};
+export const QueryGranteeGrantsDesc: UnaryMethodDefinitionish = {
+  methodName: "GranteeGrants",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryGranteeGrantsRequest.encode(this).finish();
+    }
+
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryGranteeGrantsResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
+};
+export interface Rpc {
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, request: any, metadata: grpc.Metadata | undefined): Promise<any>;
+}
+export class GrpcWebImpl {
+  host: string;
+  options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  };
+
+  constructor(host: string, options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  }) {
+    this.host = host;
+    this.options = options;
   }
 
-  const queryService = new QueryClientImpl(rpc);
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, _request: any, metadata: grpc.Metadata | undefined) {
+    const request = { ..._request,
+      ...methodDesc.requestType
+    };
+    const maybeCombinedMetadata = metadata && this.options.metadata ? new BrowserHeaders({ ...this.options?.metadata.headersMap,
+      ...metadata?.headersMap
+    }) : metadata || this.options.metadata;
+    return new Promise((resolve, reject) => {
+      grpc.unary(methodDesc, {
+        request,
+        host: this.host,
+        metadata: maybeCombinedMetadata,
+        transport: this.options.transport,
+        debug: this.options.debug,
+        onEnd: function (response) {
+          if (response.status === grpc.Code.OK) {
+            resolve(response.message);
+          } else {
+            const err = (new Error(response.statusMessage) as any);
+            err.code = response.status;
+            err.metadata = response.trailers;
+            reject(err);
+          }
+        }
+      });
+    });
+  }
 
-  _queryClients.set(rpc, queryService);
-
-  return queryService;
-};
-
-export const createRpcQueryHooks = (rpc: ProtobufRpcClient | undefined) => {
-  const queryService = getQueryService(rpc);
-
-  const useGrants = <TData = QueryGrantsResponse,>({
-    request,
-    options
-  }: UseGrantsQuery<TData>) => {
-    return useQuery<QueryGrantsResponse, Error, TData>(["grantsQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.grants(request);
-    }, options);
-  };
-
-  const useGranterGrants = <TData = QueryGranterGrantsResponse,>({
-    request,
-    options
-  }: UseGranterGrantsQuery<TData>) => {
-    return useQuery<QueryGranterGrantsResponse, Error, TData>(["granterGrantsQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.granterGrants(request);
-    }, options);
-  };
-
-  const useGranteeGrants = <TData = QueryGranteeGrantsResponse,>({
-    request,
-    options
-  }: UseGranteeGrantsQuery<TData>) => {
-    return useQuery<QueryGranteeGrantsResponse, Error, TData>(["granteeGrantsQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.granteeGrants(request);
-    }, options);
-  };
-
-  return {
-    /** Returns list of `Authorization`, granted to the grantee by the granter. */
-    useGrants,
-
-    /**
-     * GranterGrants returns list of `GrantAuthorization`, granted by granter.
-     * 
-     * Since: cosmos-sdk 0.46
-     */
-    useGranterGrants,
-
-    /**
-     * GranteeGrants returns a list of `GrantAuthorization` by grantee.
-     * 
-     * Since: cosmos-sdk 0.46
-     */
-    useGranteeGrants
-  };
-};
+}

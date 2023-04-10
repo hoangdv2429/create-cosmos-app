@@ -109,7 +109,7 @@ export default function Home() {
   //   getter: getRpcEndpoint
   // });
 
-  const rpcEndpoint = 'https://rpc.cosmos.directory/cosmoshub';
+  const rpcEndpoint = 'cosmos-grpc.polkachu.com:14990';
 
   const { data: rpcClient } = useRpcClient({
     rpcEndpoint,

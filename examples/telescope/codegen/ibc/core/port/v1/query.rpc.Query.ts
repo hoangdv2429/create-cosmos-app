@@ -1,14 +1,15 @@
-import { Rpc } from "../../../../helpers";
+import { Order, OrderSDKType, Counterparty, CounterpartySDKType } from "../../channel/v1/channel";
 import * as _m0 from "protobufjs/minimal";
-import { QueryClient, createProtobufRpcClient, ProtobufRpcClient } from "@cosmjs/stargate";
-import { ReactQueryParams } from "../../../../react-query";
-import { useQuery } from "@tanstack/react-query";
-import { QueryAppVersionRequest, QueryAppVersionResponse } from "./query";
-/** Query defines the gRPC querier service */
+import { grpc } from "@improbable-eng/grpc-web";
+import { UnaryMethodDefinitionish } from "../../../../grpc-web";
+import { DeepPartial } from "../../../../helpers";
+import { BrowserHeaders } from "browser-headers";
+import { QueryAppVersionRequest, QueryAppVersionRequestSDKType, QueryAppVersionResponse, QueryAppVersionResponseSDKType } from "./query";
 
+/** Query defines the gRPC querier service */
 export interface Query {
   /** AppVersion queries an IBC Port and determines the appropriate application version to be used */
-  appVersion(request: QueryAppVersionRequest): Promise<QueryAppVersionResponse>;
+  appVersion(request: DeepPartial<QueryAppVersionRequest>, metadata?: grpc.Metadata): Promise<QueryAppVersionResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
@@ -18,58 +19,84 @@ export class QueryClientImpl implements Query {
     this.appVersion = this.appVersion.bind(this);
   }
 
-  appVersion(request: QueryAppVersionRequest): Promise<QueryAppVersionResponse> {
-    const data = QueryAppVersionRequest.encode(request).finish();
-    const promise = this.rpc.request("ibc.core.port.v1.Query", "AppVersion", data);
-    return promise.then(data => QueryAppVersionResponse.decode(new _m0.Reader(data)));
+  appVersion(request: DeepPartial<QueryAppVersionRequest>, metadata?: grpc.Metadata): Promise<QueryAppVersionResponse> {
+    return this.rpc.unary(QueryAppVersionDesc, QueryAppVersionRequest.fromPartial(request), metadata);
   }
 
 }
-export const createRpcQueryExtension = (base: QueryClient) => {
-  const rpc = createProtobufRpcClient(base);
-  const queryService = new QueryClientImpl(rpc);
-  return {
-    appVersion(request: QueryAppVersionRequest): Promise<QueryAppVersionResponse> {
-      return queryService.appVersion(request);
+export const QueryDesc = {
+  serviceName: "ibc.core.port.v1.Query"
+};
+export const QueryAppVersionDesc: UnaryMethodDefinitionish = {
+  methodName: "AppVersion",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryAppVersionRequest.encode(this).finish();
     }
 
-  };
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryAppVersionResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
 };
-export interface UseAppVersionQuery<TData> extends ReactQueryParams<QueryAppVersionResponse, TData> {
-  request: QueryAppVersionRequest;
+export interface Rpc {
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, request: any, metadata: grpc.Metadata | undefined): Promise<any>;
 }
+export class GrpcWebImpl {
+  host: string;
+  options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  };
 
-const _queryClients: WeakMap<ProtobufRpcClient, QueryClientImpl> = new WeakMap();
-
-const getQueryService = (rpc: ProtobufRpcClient | undefined): QueryClientImpl | undefined => {
-  if (!rpc) return;
-
-  if (_queryClients.has(rpc)) {
-    return _queryClients.get(rpc);
+  constructor(host: string, options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  }) {
+    this.host = host;
+    this.options = options;
   }
 
-  const queryService = new QueryClientImpl(rpc);
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, _request: any, metadata: grpc.Metadata | undefined) {
+    const request = { ..._request,
+      ...methodDesc.requestType
+    };
+    const maybeCombinedMetadata = metadata && this.options.metadata ? new BrowserHeaders({ ...this.options?.metadata.headersMap,
+      ...metadata?.headersMap
+    }) : metadata || this.options.metadata;
+    return new Promise((resolve, reject) => {
+      grpc.unary(methodDesc, {
+        request,
+        host: this.host,
+        metadata: maybeCombinedMetadata,
+        transport: this.options.transport,
+        debug: this.options.debug,
+        onEnd: function (response) {
+          if (response.status === grpc.Code.OK) {
+            resolve(response.message);
+          } else {
+            const err = (new Error(response.statusMessage) as any);
+            err.code = response.status;
+            err.metadata = response.trailers;
+            reject(err);
+          }
+        }
+      });
+    });
+  }
 
-  _queryClients.set(rpc, queryService);
-
-  return queryService;
-};
-
-export const createRpcQueryHooks = (rpc: ProtobufRpcClient | undefined) => {
-  const queryService = getQueryService(rpc);
-
-  const useAppVersion = <TData = QueryAppVersionResponse,>({
-    request,
-    options
-  }: UseAppVersionQuery<TData>) => {
-    return useQuery<QueryAppVersionResponse, Error, TData>(["appVersionQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.appVersion(request);
-    }, options);
-  };
-
-  return {
-    /** AppVersion queries an IBC Port and determines the appropriate application version to be used */
-    useAppVersion
-  };
-};
+}

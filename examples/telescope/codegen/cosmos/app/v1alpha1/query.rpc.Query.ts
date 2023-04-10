@@ -1,14 +1,15 @@
-import { Rpc } from "../../../helpers";
+import { Config, ConfigSDKType } from "./config";
 import * as _m0 from "protobufjs/minimal";
-import { QueryClient, createProtobufRpcClient, ProtobufRpcClient } from "@cosmjs/stargate";
-import { ReactQueryParams } from "../../../react-query";
-import { useQuery } from "@tanstack/react-query";
-import { QueryConfigRequest, QueryConfigResponse } from "./query";
-/** Query is the app module query service. */
+import { grpc } from "@improbable-eng/grpc-web";
+import { UnaryMethodDefinitionish } from "../../../grpc-web";
+import { DeepPartial } from "../../../helpers";
+import { BrowserHeaders } from "browser-headers";
+import { QueryConfigRequest, QueryConfigRequestSDKType, QueryConfigResponse, QueryConfigResponseSDKType } from "./query";
 
+/** Query is the app module query service. */
 export interface Query {
   /** Config returns the current app config. */
-  config(request?: QueryConfigRequest): Promise<QueryConfigResponse>;
+  config(request?: DeepPartial<QueryConfigRequest>, metadata?: grpc.Metadata): Promise<QueryConfigResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
@@ -18,58 +19,84 @@ export class QueryClientImpl implements Query {
     this.config = this.config.bind(this);
   }
 
-  config(request: QueryConfigRequest = {}): Promise<QueryConfigResponse> {
-    const data = QueryConfigRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.app.v1alpha1.Query", "Config", data);
-    return promise.then(data => QueryConfigResponse.decode(new _m0.Reader(data)));
+  config(request: DeepPartial<QueryConfigRequest> = {}, metadata?: grpc.Metadata): Promise<QueryConfigResponse> {
+    return this.rpc.unary(QueryConfigDesc, QueryConfigRequest.fromPartial(request), metadata);
   }
 
 }
-export const createRpcQueryExtension = (base: QueryClient) => {
-  const rpc = createProtobufRpcClient(base);
-  const queryService = new QueryClientImpl(rpc);
-  return {
-    config(request?: QueryConfigRequest): Promise<QueryConfigResponse> {
-      return queryService.config(request);
+export const QueryDesc = {
+  serviceName: "cosmos.app.v1alpha1.Query"
+};
+export const QueryConfigDesc: UnaryMethodDefinitionish = {
+  methodName: "Config",
+  service: QueryDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: ({
+    serializeBinary() {
+      return QueryConfigRequest.encode(this).finish();
     }
 
-  };
+  } as any),
+  responseType: ({
+    deserializeBinary(data: Uint8Array) {
+      return { ...QueryConfigResponse.decode(data),
+
+        toObject() {
+          return this;
+        }
+
+      };
+    }
+
+  } as any)
 };
-export interface UseConfigQuery<TData> extends ReactQueryParams<QueryConfigResponse, TData> {
-  request?: QueryConfigRequest;
+export interface Rpc {
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, request: any, metadata: grpc.Metadata | undefined): Promise<any>;
 }
+export class GrpcWebImpl {
+  host: string;
+  options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  };
 
-const _queryClients: WeakMap<ProtobufRpcClient, QueryClientImpl> = new WeakMap();
-
-const getQueryService = (rpc: ProtobufRpcClient | undefined): QueryClientImpl | undefined => {
-  if (!rpc) return;
-
-  if (_queryClients.has(rpc)) {
-    return _queryClients.get(rpc);
+  constructor(host: string, options: {
+    transport?: grpc.TransportFactory;
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+  }) {
+    this.host = host;
+    this.options = options;
   }
 
-  const queryService = new QueryClientImpl(rpc);
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, _request: any, metadata: grpc.Metadata | undefined) {
+    const request = { ..._request,
+      ...methodDesc.requestType
+    };
+    const maybeCombinedMetadata = metadata && this.options.metadata ? new BrowserHeaders({ ...this.options?.metadata.headersMap,
+      ...metadata?.headersMap
+    }) : metadata || this.options.metadata;
+    return new Promise((resolve, reject) => {
+      grpc.unary(methodDesc, {
+        request,
+        host: this.host,
+        metadata: maybeCombinedMetadata,
+        transport: this.options.transport,
+        debug: this.options.debug,
+        onEnd: function (response) {
+          if (response.status === grpc.Code.OK) {
+            resolve(response.message);
+          } else {
+            const err = (new Error(response.statusMessage) as any);
+            err.code = response.status;
+            err.metadata = response.trailers;
+            reject(err);
+          }
+        }
+      });
+    });
+  }
 
-  _queryClients.set(rpc, queryService);
-
-  return queryService;
-};
-
-export const createRpcQueryHooks = (rpc: ProtobufRpcClient | undefined) => {
-  const queryService = getQueryService(rpc);
-
-  const useConfig = <TData = QueryConfigResponse,>({
-    request,
-    options
-  }: UseConfigQuery<TData>) => {
-    return useQuery<QueryConfigResponse, Error, TData>(["configQuery", request], () => {
-      if (!queryService) throw new Error("Query Service not initialized");
-      return queryService.config(request);
-    }, options);
-  };
-
-  return {
-    /** Config returns the current app config. */
-    useConfig
-  };
-};
+}
