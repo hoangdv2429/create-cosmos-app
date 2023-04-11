@@ -12,8 +12,8 @@ import { GrpcWebImpl } from '../codegen/cosmos/bank/v1beta1/query.rpc.Query';
 import { ServiceClientImpl } from "../codegen/cosmos/tx/v1beta1/service.rpc.Service";
 import { QueryClientImpl } from "../codegen/cosmos/bank/v1beta1/query.rpc.Query";
 
-const _rpcClients: Record<string, ProtobufRpcClient> = {};
-let tmClient: QueryClientImpl;
+const _rpcClients: Record<string, ServiceClientImpl> = {};
+let tmClient: ServiceClientImpl;
 let grpcWeb: GrpcWebImpl;
 
 export const getRpcEndpointKey = (rpcEndpoint: string | HttpEndpoint) => {
@@ -51,9 +51,8 @@ export const getRpcClient = async (rpcEndpoint: string | HttpEndpoint) => {
     }
 
     //@ts-ignore
-    const client = new QueryClient(grpcWeb);
-    const rpc = createProtobufRpcClient(client);
+    tmClient = new ServiceClientImpl(grpcWeb);
     // tmClient = new QueryClientImpl(grpcWeb);
-    _rpcClients[key] = rpc;
-    return rpc;
+    _rpcClients[key] = tmClient;
+    return tmClient;
 }
