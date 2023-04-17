@@ -1,4 +1,9 @@
-import { Rpc } from "../helpers";
+import { grpc } from "@improbable-eng/grpc-web"
+import { UnaryMethodDefinitionish } from "../grpc-web";
+interface Rpc {
+  unary<T extends UnaryMethodDefinitionish>(methodDesc: T, request: any, metadata: grpc.Metadata | undefined): Promise<any>;
+}
+
 export const createRPCMsgClient = async ({
   rpc
 }: {

@@ -44,23 +44,23 @@ export class ServiceClientImpl implements Service {
   }
 
   simulate(request: DeepPartial<SimulateRequest>, metadata?: grpc.Metadata): Promise<SimulateResponse> {
-    return this.rpc.unary(SimulateDesc, SimulateRequest.fromPartial(request), metadata);
+    return this.rpc.unary(ServiceSimulateDesc, SimulateRequest.fromPartial(request), metadata);
   }
 
   getTx(request: DeepPartial<GetTxRequest>, metadata?: grpc.Metadata): Promise<GetTxResponse> {
-    return this.rpc.unary(GetTxDesc, GetTxRequest.fromPartial(request), metadata);
+    return this.rpc.unary(ServiceGetTxDesc, GetTxRequest.fromPartial(request), metadata);
   }
 
   broadcastTx(request: DeepPartial<BroadcastTxRequest>, metadata?: grpc.Metadata): Promise<BroadcastTxResponse> {
-    return this.rpc.unary(BroadcastTxDesc, BroadcastTxRequest.fromPartial(request), metadata);
+    return this.rpc.unary(ServiceBroadcastTxDesc, BroadcastTxRequest.fromPartial(request), metadata);
   }
 
   getTxsEvent(request: DeepPartial<GetTxsEventRequest>, metadata?: grpc.Metadata): Promise<GetTxsEventResponse> {
-    return this.rpc.unary(GetTxsEventDesc, GetTxsEventRequest.fromPartial(request), metadata);
+    return this.rpc.unary(ServiceGetTxsEventDesc, GetTxsEventRequest.fromPartial(request), metadata);
   }
 
   getBlockWithTxs(request: DeepPartial<GetBlockWithTxsRequest>, metadata?: grpc.Metadata): Promise<GetBlockWithTxsResponse> {
-    return this.rpc.unary(GetBlockWithTxsDesc, GetBlockWithTxsRequest.fromPartial(request), metadata);
+    return this.rpc.unary(ServiceGetBlockWithTxsDesc, GetBlockWithTxsRequest.fromPartial(request), metadata);
   }
 
 }

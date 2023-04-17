@@ -10,7 +10,6 @@ import { grpc } from "@improbable-eng/grpc-web";
 import { NodeHttpTransport } from "@improbable-eng/grpc-web-node-http-transport";
 import { GrpcWebImpl } from '../codegen/cosmos/bank/v1beta1/query.rpc.Query';
 import { ServiceClientImpl } from "../codegen/cosmos/tx/v1beta1/service.rpc.Service";
-import { QueryClientImpl } from "../codegen/cosmos/bank/v1beta1/query.rpc.Query";
 
 const _rpcClients: Record<string, ServiceClientImpl> = {};
 let tmClient: ServiceClientImpl;
@@ -51,7 +50,7 @@ export const getRpcClient = async (rpcEndpoint: string | HttpEndpoint) => {
     }
 
     //@ts-ignore
-    tmClient = new ServiceClientImpl(grpcWeb);
+    grcWebClient = new ServiceClientImpl(grpcWeb);
     // tmClient = new QueryClientImpl(grpcWeb);
     _rpcClients[key] = tmClient;
     return tmClient;

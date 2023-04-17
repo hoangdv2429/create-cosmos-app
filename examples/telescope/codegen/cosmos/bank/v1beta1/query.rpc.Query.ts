@@ -402,9 +402,9 @@ export interface UseDenomOwnersQuery<TData> extends ReactQueryParams<QueryDenomO
   request: QueryDenomOwnersRequest;
 }
 
-const _queryClients: WeakMap<ProtobufRpcClient, QueryClientImpl> = new WeakMap();
+const _queryClients: WeakMap<Rpc, QueryClientImpl> = new WeakMap();
 
-const getQueryService = (rpc: ProtobufRpcClient | undefined): QueryClientImpl | undefined => {
+const getQueryService = (rpc: Rpc | undefined): QueryClientImpl | undefined => {
   if (!rpc) return;
 
   if (_queryClients.has(rpc)) {
@@ -418,7 +418,7 @@ const getQueryService = (rpc: ProtobufRpcClient | undefined): QueryClientImpl | 
   return queryService;
 };
 
-export const createRpcQueryHooks = (rpc: ProtobufRpcClient | undefined) => {
+export const createRpcQueryHooks = (rpc: Rpc | undefined) => {
   const queryService = getQueryService(rpc);
 
   const useBalance = <TData = QueryBalanceResponse,>({
