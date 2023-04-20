@@ -73,7 +73,7 @@ export class ServiceClientImpl implements Service {
 export const ServiceDesc = {
   serviceName: "cosmos.base.tendermint.v1beta1.Service"
 };
-export const ServiceGetNodeInfoDesc: UnaryMethodDefinitionish = {
+export const GetNodeInfoDesc: UnaryMethodDefinitionish = {
   methodName: "GetNodeInfo",
   service: ServiceDesc,
   requestStream: false,
@@ -97,7 +97,7 @@ export const ServiceGetNodeInfoDesc: UnaryMethodDefinitionish = {
 
   } as any)
 };
-export const ServiceGetSyncingDesc: UnaryMethodDefinitionish = {
+export const GetSyncingDesc: UnaryMethodDefinitionish = {
   methodName: "GetSyncing",
   service: ServiceDesc,
   requestStream: false,
@@ -121,7 +121,7 @@ export const ServiceGetSyncingDesc: UnaryMethodDefinitionish = {
 
   } as any)
 };
-export const ServiceGetLatestBlockDesc: UnaryMethodDefinitionish = {
+export const GetLatestBlockDesc: UnaryMethodDefinitionish = {
   methodName: "GetLatestBlock",
   service: ServiceDesc,
   requestStream: false,
@@ -145,7 +145,7 @@ export const ServiceGetLatestBlockDesc: UnaryMethodDefinitionish = {
 
   } as any)
 };
-export const ServiceGetBlockByHeightDesc: UnaryMethodDefinitionish = {
+export const GetBlockByHeightDesc: UnaryMethodDefinitionish = {
   methodName: "GetBlockByHeight",
   service: ServiceDesc,
   requestStream: false,
@@ -169,7 +169,7 @@ export const ServiceGetBlockByHeightDesc: UnaryMethodDefinitionish = {
 
   } as any)
 };
-export const ServiceGetLatestValidatorSetDesc: UnaryMethodDefinitionish = {
+export const GetLatestValidatorSetDesc: UnaryMethodDefinitionish = {
   methodName: "GetLatestValidatorSet",
   service: ServiceDesc,
   requestStream: false,
@@ -193,7 +193,7 @@ export const ServiceGetLatestValidatorSetDesc: UnaryMethodDefinitionish = {
 
   } as any)
 };
-export const ServiceGetValidatorSetByHeightDesc: UnaryMethodDefinitionish = {
+export const GetValidatorSetByHeightDesc: UnaryMethodDefinitionish = {
   methodName: "GetValidatorSetByHeight",
   service: ServiceDesc,
   requestStream: false,
