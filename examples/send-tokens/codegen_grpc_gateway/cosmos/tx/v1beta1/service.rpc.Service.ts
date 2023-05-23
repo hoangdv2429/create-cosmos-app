@@ -8,7 +8,7 @@ import { SimulateRequest, SimulateRequestSDKType, SimulateResponse, SimulateResp
 export class Service {
   /** Simulate simulates executing a transaction for estimating gas usage. */
   static simulate(request: SimulateRequest, initRequest?: fm.InitReq): Promise<SimulateResponse> {
-    return fm.fetchReq(`/cosmos.tx.v1beta1/simulate`, {
+    return fm.fetchReq(`/cosmos/tx/v1beta1/simulate`, {
       ...initRequest,
       method: "POST",
       body: JSON.stringify(request, fm.replacer)
@@ -24,12 +24,11 @@ export class Service {
     });
   }
   /** BroadcastTx broadcast transaction. */
-  static broadcastTx(request: BroadcastTxRequest, initRequest?: fm.InitReq): Promise<BroadcastTxResponse> {
-    return fm.fetchReq(`/cosmos.tx.v1beta1/broadcastTx`, {
-      ...initRequest,
+  static broadcastTx(req: BroadcastTxRequest, initReq?: fm.InitReq): Promise<BroadcastTxResponse> {
+    return fm.fetchReq<BroadcastTxRequest, BroadcastTxResponse>(`/cosmos/tx/v1beta1/txs`, {
+      ...initReq,
       method: "POST",
-      body: JSON.stringify(request, fm.replacer)
-    });
+      body: JSON.stringify(req, fm.replacer)})
   }
   /** GetTxsEvent fetches txs by event. */
   static getTxsEvent(request: GetTxsEventRequest, initRequest?: fm.InitReq): Promise<GetTxsEventResponse> {

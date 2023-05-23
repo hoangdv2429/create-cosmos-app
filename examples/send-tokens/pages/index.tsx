@@ -4,7 +4,7 @@ import { useChain } from '@cosmos-kit/react';
 import { StdFee } from '@cosmjs/amino';
 import { SignerData, SigningStargateClient } from '@cosmjs/stargate';
 import BigNumber from 'bignumber.js';
-import { cosmos } from '../codegen_grpc_web';
+import { cosmos } from '../codegen_grpc_gateway';
 
 import {
   Box,
@@ -38,7 +38,7 @@ import {
   handleChangeColorModeValue,
 } from '../components';
 import { SendTokensCard } from '../components/react/send-tokens-card';
-import { TxRaw } from '../codegen_grpc_web/cosmos/tx/v1beta1/tx';
+import { TxRaw } from '../codegen_grpc_gateway/cosmos/tx/v1beta1/tx';
 
 // import { cosmos } from 'interchain';
 
@@ -49,13 +49,13 @@ const library = {
 };
 
 const sendTokens = (
-  getGrpcWebClient: () => any,
+  getGrpcGatewayClient: () => any,
   getSigningStargateClient: () => Promise<SigningStargateClient>,
   setResp: (resp: string) => any,
   address: string
 ) => {
   return async () => {
-    const grpcWebClient = await getGrpcWebClient();
+    const grpcGatewayClient = await getGrpcGatewayClient();
     const stargateClient = await getSigningStargateClient();
     if (!stargateClient || !address) {
       console.error('stargateClient undefined or address undefined.');
@@ -87,21 +87,22 @@ const sendTokens = (
     // const response = await stargateClient.signAndBroadcast(address, [msg], fee);
 
     // fetch account data
-    const account = await grpcWebClient.cosmos.auth.v1beta1.account({
+    const account = await grpcGatewayClient.cosmos.auth.v1beta1.account({
       address
     });
 
     const baseAccount =
-      account.account as import("./../codegen_grpc_web/cosmos/auth/v1beta1/auth").BaseAccount;
+      account.account as import("./../codegen_grpc_gateway/cosmos/auth/v1beta1/auth").BaseAccount;
     const signerData = {
-      accountNumber: Number(baseAccount.accountNumber),
+      accountNumber: Number(baseAccount.account_number),
       sequence: Number(baseAccount.sequence),
       chainId: 'osmosis-1'
+      // chainId: 'osmo-test-4'
     };
 
-    const signed_tx = await stargateClient.sign(address, [msg], fee, 'sent through telescope grpc-web', signerData)
+    const signed_tx = await stargateClient.sign(address, [msg], fee, 'sent through telescope grpc-gateway', signerData)
     const txRawBytes = Uint8Array.from(TxRaw.encode(signed_tx).finish());
-    const response = await grpcWebClient.cosmos.tx.v1beta1.broadcastTx(  
+    const response = await grpcGatewayClient.cosmos.tx.v1beta1.broadcastTx(  
       {
         txBytes: txRawBytes,
         mode: 1
@@ -134,7 +135,7 @@ export default function Home() {
     //   console.log('no rpc endpoint — using a fallback');
     //   rpcEndpoint = `https://rpc.cosmos.directory/${chainName}`;
     // }
-    const client = await getGrpcWebClient();
+    const client = await getGrpcGatewayClient();
 
     // fetch balance
     const balance = await client.cosmos.bank.v1beta1.balance({
@@ -154,12 +155,12 @@ export default function Home() {
     setFetchingBalance(false);
   };
 
-  const getGrpcWebClient = async () => {
-    // grpc-web endpoint
-    const rpcEndpoint = 'https://osmosis-grpc-web.polkachu.com';
+  const getGrpcGatewayClient = async () => {
+    // LCD endpoint
+    const rpcEndpoint = 'https://lcd.osmosis.zone/';
 
-    // get gRPC-web client
-    const client = await cosmos.ClientFactory.createGrpcWebClient({
+    // get gRPC-gateway client
+    const client = await cosmos.ClientFactory.createGrpcGateWayClient({
       endpoint: rpcEndpoint,
     });
 
@@ -225,7 +226,7 @@ export default function Home() {
           response={resp}
           sendTokensButtonText="Send Tokens"
           handleClickSendTokens={sendTokens(
-            getGrpcWebClient as () => any,
+            getGrpcGatewayClient as () => any,
             getSigningStargateClient as () => Promise<SigningStargateClient>,
             setResp as () => any,
             address as string

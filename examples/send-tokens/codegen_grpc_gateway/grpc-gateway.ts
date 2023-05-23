@@ -4,8 +4,6 @@
 * and run the transpile command or yarn proto command to regenerate this bundle.
 */
 
-
-
 /**
  * base64 encoder and decoder
  * Copied and adapted from https://github.com/protobufjs/protobuf.js/blob/master/lib/base64/index.js
@@ -140,7 +138,7 @@ export type NotifyStreamEntityArrival<T> = (resp: T) => void
  **/
 export async function fetchStreamingRequest<S, R>(path: string, callback?: NotifyStreamEntityArrival<R>, init?: InitReq) {
   const {pathPrefix, ...req} = init || {}
-  const url = pathPrefix ? `${pathPrefix}${path}` : path
+  const url = pathPrefix ?`${pathPrefix}${path}` : path
   const result = await fetch(url, req)
   // needs to use the .ok to check the status of HTTP status code
   // http other than 200 will not throw an error, instead the .ok will become false.
@@ -197,8 +195,7 @@ function getNewLineDelimitedJSONDecodingStream<T>(): TransformStream<string, T> 
       }
       controller.buf += chunk
       while (controller.pos < controller.buf.length) {
-        if (controller.buf[controller.pos] === '
-') {
+        if (controller.buf[controller.pos] === '\n') {
           const line = controller.buf.substring(0, controller.pos)
           const response = JSON.parse(line)
           controller.enqueue(response.result)
